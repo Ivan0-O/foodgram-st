@@ -35,3 +35,12 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name.__str__()
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.recipe} {self.ingredient}'
+
