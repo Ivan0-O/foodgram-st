@@ -26,7 +26,8 @@ class Recipe(models.Model):
 
     # ???
     # Ингредиенты — продукты для приготовления блюда по рецепту.
-    # Множественное поле с выбором из предустановленного списка и с указанием количества и единицы измерения.
+    # Множественное поле с выбором из предустановленного списка и
+    # с указанием количества и единицы измерения.
     ingredients = models.ManyToManyField(
         Ingredient,
         through="RecipeIngredient")  # TODO: create RecipeIngredient
@@ -42,5 +43,4 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.recipe} {self.ingredient}'
-
+        return f"{self.recipe} {self.ingredient}"
