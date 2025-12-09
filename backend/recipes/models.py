@@ -6,7 +6,7 @@ User = get_user_model()
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=64)
-    measure = models.CharField(max_length=16)
+    measurement_unit = models.CharField(max_length=16)
 
     def __str__(self):
         return f"{self.name} ({self.measure})"
@@ -22,7 +22,7 @@ class Recipe(models.Model):
         null=True,
         default=None,
     )
-    desctiption = models.TextField()
+    description = models.TextField()
 
     # ???
     # Ингредиенты — продукты для приготовления блюда по рецепту.

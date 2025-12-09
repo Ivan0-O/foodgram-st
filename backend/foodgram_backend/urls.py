@@ -17,8 +17,10 @@ router.register(r"ingredients", IngredientViewSet)
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
-    # path("api/", include("djoser.urls")),  # Работа с пользователями
-    # path("api/", include("djoser.urls.authtoken")),  # Работа с токенами
+
+    # djoser
+    path("api/", include("djoser.urls")),
+    path("api/auth/", include("djoser.urls.authtoken")),
 ]
 
 if settings.DEBUG:
