@@ -1,7 +1,7 @@
+
 from rest_framework import serializers
 
 from .models import Ingredient, Recipe
-
 
 class IngredientSerializer(serializers.ModelSerializer):
 
@@ -17,4 +17,4 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ("name", "author", "image", "description", "ingredients",
                   "cook_time")
-        read_only_fields = ("author",)
+        read_only_fields = ("author", )
