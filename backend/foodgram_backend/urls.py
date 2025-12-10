@@ -6,21 +6,21 @@ from django.urls import include, path
 
 from django.views.generic import TemplateView
 
-from rest_framework import routers
-
-from recipes.views import IngredientViewSet, RecipeViewSet
-
-router = routers.DefaultRouter()
-router.register(r"recipes", RecipeViewSet)
-router.register(r"ingredients", IngredientViewSet)
+# from rest_framework import routers
+#
+# from recipes.views import IngredientViewSet, RecipeViewSet
+#
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include(router.urls)),
+
+    path("api/", include("recipes.urls")),
+
+    path("api/", include("users.urls")),
 
     # djoser
-    path("api/", include("djoser.urls")),
     path("api/auth/", include("djoser.urls.authtoken")),
+    path("api/auth/", include("djoser.urls")),
 ]
 
 if settings.DEBUG:
