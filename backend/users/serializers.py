@@ -37,11 +37,9 @@ class AvatarSerializer(serializers.ModelSerializer):
         fields = ("avatar", "image")
 
 
-class UserSerializer(djoser_serializers.UserCreateSerializer):
+class UserShortSerializer(djoser_serializers.UserCreateSerializer):
     email = serializers.EmailField(
         validators=[validators.UniqueValidator(queryset=User.objects.all())])
-    avatar = serializers.ImageField(source="avatar.image", read_only=True)
-    is_subscribed = serializers.SerializerMethodField()
 
     class Meta(djoser_serializers.UserCreateSerializer.Meta):
         fields = (
@@ -51,8 +49,6 @@ class UserSerializer(djoser_serializers.UserCreateSerializer):
             "password",
             "first_name",
             "last_name",
-            "is_subscribed",
-            "avatar",
         )
         extra_kwargs = {
             "password": {
@@ -71,6 +67,14 @@ class UserSerializer(djoser_serializers.UserCreateSerializer):
                 "required": True
             },
         }
+
+
+class UserSerializer(UserShortSerializer):
+    avatar = serializers.ImageField(source="avatar.image", read_only=True)
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta(UserShortSerializer.Meta):
+        fields = UserShortSerializer.Meta.fields + ("is_subscribed", "avatar")
 
     def get_is_subscribed(self, sub_to):
         request = self.context.get("request")
