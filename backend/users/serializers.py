@@ -8,7 +8,7 @@ from djoser import serializers as djoser_serializers
 from rest_framework import serializers
 from rest_framework import validators
 
-from .models import Avatar
+from .models import Avatar, Subscription
 
 User = get_user_model()
 
@@ -41,6 +41,7 @@ class UserSerializer(djoser_serializers.UserCreateSerializer):
     email = serializers.EmailField(
         validators=[validators.UniqueValidator(queryset=User.objects.all())])
     avatar = serializers.ImageField(source="avatar.image", read_only=True)
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta(djoser_serializers.UserCreateSerializer.Meta):
         fields = (
@@ -50,7 +51,7 @@ class UserSerializer(djoser_serializers.UserCreateSerializer):
             "password",
             "first_name",
             "last_name",
-            # "is_subscribed",
+            "is_subscribed",
             "avatar",
         )
         extra_kwargs = {
@@ -70,6 +71,28 @@ class UserSerializer(djoser_serializers.UserCreateSerializer):
                 "required": True
             },
         }
+
+    def get_is_subscribed(self, sub_to):
+        request = self.context.get("request")
+        if request is None or request.user.is_anonymous:
+            return False
+
+        return Subscription.objects.filter(subscriber=request.user,
+                                           subscribed_to=sub_to).exists()
+
+
+class UserWithRecipesSerializer(UserSerializer):
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ("recipes", "recipes_count")
+
+    def get_recipes(self, sub_to):
+        pass
+
+    def get_recipes_count(self, sub_to):
+        pass
 
 
 # Requires email+password combination instead of default username+password
