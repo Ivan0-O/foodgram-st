@@ -1,20 +1,27 @@
 from rest_framework import serializers
 
+
 from .models import Ingredient, Recipe
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Ingredient
-        fields = ("name", "measurement_unit")
-        # read_only_fields = ("name", "measurement_unit")
+        fields = ("id", "name", "measurement_unit")
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        fields = ("name", "author", "image", "description", "ingredients",
-                  "cook_time")
+        fields = ("id", "author", "ingredients", "is_favorited",
+                  "is_in_shopping_cart", "name", "image", "text", "cook_time")
         read_only_fields = ("author", )
+
+    def get_is_favorited(self):
+        return False
+
+    def get_is_in_shopping_cart(self):
+        return False

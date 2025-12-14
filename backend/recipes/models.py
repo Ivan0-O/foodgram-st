@@ -22,15 +22,14 @@ class Recipe(models.Model):
         null=True,
         default=None,
     )
-    description = models.TextField()
+    text = models.TextField()  # description
 
     # ???
     # Ингредиенты — продукты для приготовления блюда по рецепту.
     # Множественное поле с выбором из предустановленного списка и
     # с указанием количества и единицы измерения.
-    ingredients = models.ManyToManyField(
-        Ingredient,
-        through="RecipeIngredient")  # TODO: create RecipeIngredient
+    ingredients = models.ManyToManyField(Ingredient,
+                                         through="RecipeIngredient")
 
     cook_time = models.PositiveIntegerField()  # in minutes
 
