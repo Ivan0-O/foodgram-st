@@ -5,8 +5,8 @@ User = get_user_model()
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=64)
-    measurement_unit = models.CharField(max_length=16)
+    name = models.CharField(max_length=128)
+    measurement_unit = models.CharField(max_length=64)
 
     def __str__(self):
         return f"{self.name} ({self.measure})"
@@ -16,7 +16,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(User,
                                related_name="recipes",
                                on_delete=models.CASCADE)
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=256)
     image = models.ImageField(
         upload_to="recipes/images/",
         null=True,
@@ -24,10 +24,6 @@ class Recipe(models.Model):
     )
     text = models.TextField()  # description
 
-    # ???
-    # Ингредиенты — продукты для приготовления блюда по рецепту.
-    # Множественное поле с выбором из предустановленного списка и
-    # с указанием количества и единицы измерения.
     ingredients = models.ManyToManyField(Ingredient,
                                          through="RecipeIngredient")
 
@@ -40,6 +36,11 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.recipe} {self.ingredient}"
+        return (
+            f"{self.recipe.__str__()}: {self.ingredient.name.__str__()}"
+            f"{self.amount.__str__()} {(self.ingredient
+                                        .measurement_unit.__str__())}"
+        )
