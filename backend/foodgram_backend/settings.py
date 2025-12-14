@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # My apps
     "recipes.apps.RecipesConfig",
     "users.apps.UsersConfig",
+    "core.apps.CoreConfig",
 ]
 
 MIDDLEWARE = [
