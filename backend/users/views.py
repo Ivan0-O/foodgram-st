@@ -22,16 +22,16 @@ class UserViewSet(djoser_views.UserViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = pagination.LimitOffsetPagination
 
-    def get_permissions(self):
-        # Refuse if an anonymous user tries to get the /users/me/
-        if self.action == "me":
-            return [permissions.IsAuthenticated()]
-
-        # Otherwise use the permission_classes default
-        return super().get_permissions()
-
     def get_queryset(self):
         return User.objects.all().order_by("username")
+
+    @action(
+        detail=False,
+        url_path="me",
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def me(self, request):
+        return super().me(request)
 
     @action(
         detail=False,
