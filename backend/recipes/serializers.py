@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
-
 from .models import Ingredient, Recipe
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Ingredient
         fields = ("id", "name", "measurement_unit")
@@ -17,7 +17,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ("id", "author", "ingredients", "is_favorited",
-                  "is_in_shopping_cart", "name", "image", "text", "cook_time")
+                  "is_in_shopping_cart", "name", "image", "text",
+                  "cooking_time")
         read_only_fields = ("author", )
 
     def get_is_favorited(self):

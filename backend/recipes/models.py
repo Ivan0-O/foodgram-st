@@ -31,7 +31,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient,
                                          through="RecipeIngredient")
 
-    cook_time = models.PositiveIntegerField()  # in minutes
+    cooking_time = models.PositiveIntegerField()  # in minutes
 
     def __str__(self):
         return self.name.__str__()
