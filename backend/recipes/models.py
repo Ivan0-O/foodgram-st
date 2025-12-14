@@ -24,9 +24,6 @@ class Recipe(models.Model):
     )
     text = models.TextField()  # description
 
-    ingredients = models.ManyToManyField(Ingredient,
-                                         through="RecipeIngredient")
-
     cooking_time = models.PositiveIntegerField()  # in minutes
 
     def __str__(self):
@@ -34,8 +31,11 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(
+        Recipe, related_name="recipe_ingredients", on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(
+        Ingredient, related_name="recipe_ingredients",
+        on_delete=models.CASCADE)
     amount = models.PositiveIntegerField()
 
     def __str__(self):
