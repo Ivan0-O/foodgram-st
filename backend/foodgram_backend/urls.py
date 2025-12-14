@@ -22,7 +22,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
     urlpatterns += [
-        path("redoc/",
+        path("api/docs/",
              TemplateView.as_view(template_name="redoc.html"),
              name="redoc"),
     ]
