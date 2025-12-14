@@ -12,15 +12,14 @@ User = get_user_model()
 
 
 class AvatarSerializer(serializers.ModelSerializer):
-    # url of the image: "http://foodgram.example.org/media/users/image.png"
-    avatar = serializers.ImageField(source="image", read_only=True)
-
-    # base64 representation of the image: "data:image/png;base64,xyz"
-    image = Base64ImageField(write_only=True, required=False, allow_null=True)
+    avatar = Base64ImageField(write_only=True, required=True)
 
     class Meta:
         model = Avatar
-        fields = ("avatar", "image")
+        fields = ("avatar", )
+
+    def to_representation(self, avatar):
+        return {"avatar": avatar.image.url}
 
 
 class UserShortSerializer(djoser_serializers.UserCreateSerializer):

@@ -52,16 +52,7 @@ class UserViewSet(djoser_views.UserViewSet):
         # POST
         avatar, created = Avatar.objects.get_or_create(user=user)
 
-        data = request.data
-        # moving from "avatar" to "image" because of the naming gimmick
-        # in the AvatarSerializer
-        try:
-            data["image"] = data.pop("avatar")
-        except KeyError:
-            return Response(data={"avatar": "This field is required."},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = self.get_serializer(avatar, data=data)
+        serializer = self.get_serializer(avatar, data=request.data)
         serializer.is_valid(raise_exception=True)
 
         serializer.save()
