@@ -19,11 +19,9 @@ User = get_user_model()
 
 
 class UserViewSet(djoser_views.UserViewSet):
+    queryset = User.objects.all().order_by("username")
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = pagination.LimitOffsetPagination
-
-    def get_queryset(self):
-        return User.objects.all().order_by("username")
 
     @action(
         detail=False,
