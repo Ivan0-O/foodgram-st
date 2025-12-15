@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework import validators
 
 from .models import Avatar, Subscription
+from recipes.models import Recipe
 from core.serializers import Base64ImageField
 
 User = get_user_model()
@@ -74,17 +75,17 @@ class UserSerializer(UserShortSerializer):
 
 
 class UserWithRecipesSerializer(UserSerializer):
-    recipes = serializers.SerializerMethodField()
+    # local import to resolve circular dependency
+    from recipes.serializers import RecipeShortSerialzier
+
+    recipes = RecipeShortSerialzier(read_only=True, many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ("recipes", "recipes_count")
 
-    def get_recipes(self, sub_to):
-        pass
-
     def get_recipes_count(self, sub_to):
-        pass
+        return sub_to.recipes.count()
 
 
 # Requires email+password combination instead of default username+password

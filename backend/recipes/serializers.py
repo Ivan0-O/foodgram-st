@@ -29,26 +29,41 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         return amount
 
 
-class RecipeSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
-    ingredients = RecipeIngredientSerializer(source="recipe_ingredients",
-                                             many=True,
-                                             required=False)
+class RecipeShortSerialzier(serializers.ModelSerializer):
     image = Base64ImageField(write_only=True, required=True)
 
     class Meta:
         model = Recipe
-        fields = ("id", "author", "ingredients", "is_favorited",
-                  "is_in_shopping_cart", "name", "image", "text",
-                  "cooking_time")
+        fields = ("id", "name", "image", "cooking_time")
 
     def to_representation(self, recipe):
         data = super().to_representation(recipe)
         data["image"] = self.context.get("request").build_absolute_uri(
             recipe.image.url)
         return data
+
+    def validate_cooking_time(self, cooking_time):
+        if cooking_time < 1:
+            raise serializers.ValidationError(
+                "Cooking time should be atleast 1.")
+
+        return cooking_time
+
+
+class RecipeSerializer(RecipeShortSerialzier):
+    author = UserSerializer(read_only=True)
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    ingredients = RecipeIngredientSerializer(source="recipe_ingredients",
+                                             many=True,
+                                             required=False)
+
+    class Meta(RecipeShortSerialzier.Meta):
+        # redefining and not inheriting because we need to keep the specified
+        # ordering (e.g. `author` goes after `id` but before `name`)
+        fields = ("id", "author", "ingredients", "is_favorited",
+                  "is_in_shopping_cart", "name", "image", "text",
+                  "cooking_time")
 
     def validate(self, recipe):
         # `ingredients` is being mapped to `recipe_ingredients`
@@ -62,13 +77,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 {"ingredients": ["Ingredients cannot be empty."]})
 
         return super().validate(recipe)
-
-    def validate_cooking_time(self, cooking_time):
-        if cooking_time < 1:
-            raise serializers.ValidationError(
-                "Cooking time should be atleast 1.")
-
-        return cooking_time
 
     def _push_ingredients(self, recipe, ingredients):
         for ingredient_data in ingredients:
