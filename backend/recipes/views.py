@@ -1,10 +1,17 @@
-from rest_framework import viewsets, mixins, permissions, pagination, filters
+from django.shortcuts import get_object_or_404
+
+from rest_framework import (viewsets, mixins, permissions, pagination, filters,
+                            status)
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Ingredient, Recipe
 from .serializers import IngredientSerializer, RecipeSerializer
 from core.permissions import IsAuthorOrReadOnly
+from shortlinks.models import ShortLink
+from shortlinks.serializers import ShortLinkSerializer
 
 
 class IngredientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
@@ -34,3 +41,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[permissions.AllowAny],
+        serializer_class=ShortLinkSerializer,
+        url_path="get-link",
+    )
+    def get_link(self, request, pk):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        link, _ = ShortLink.objects.get_or_create(recipe=recipe)
+        serializer = self.get_serializer(link)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

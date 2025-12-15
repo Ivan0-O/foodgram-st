@@ -42,9 +42,10 @@ INSTALLED_APPS = [
     # Djoser
     "djoser",
     # My apps
-    "recipes.apps.RecipesConfig",
-    "users.apps.UsersConfig",
     "core.apps.CoreConfig",
+    "users.apps.UsersConfig",
+    "recipes.apps.RecipesConfig",
+    "shortlinks.apps.ShortlinksConfig",
 ]
 
 MIDDLEWARE = [

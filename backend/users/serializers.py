@@ -19,7 +19,10 @@ class AvatarSerializer(serializers.ModelSerializer):
         fields = ("avatar", )
 
     def to_representation(self, avatar):
-        return {"avatar": avatar.image.url}
+        return {
+            "avatar":
+            self.context.get("request").build_absolute_uri(avatar.image.url)
+        }
 
 
 class UserShortSerializer(djoser_serializers.UserCreateSerializer):

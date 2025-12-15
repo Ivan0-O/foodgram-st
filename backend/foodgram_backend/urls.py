@@ -9,9 +9,9 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    path("api/", include("recipes.urls")),
-
+    path("s/", include("shortlinks.urls")),
     path("api/", include("users.urls")),
+    path("api/", include("recipes.urls")),
 
     # djoser
     path("api/auth/", include("djoser.urls.authtoken")),

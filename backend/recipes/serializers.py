@@ -46,7 +46,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, recipe):
         data = super().to_representation(recipe)
-        data["image"] = recipe.image.url
+        data["image"] = self.context.get("request").build_absolute_uri(
+            recipe.image.url)
         return data
 
     def validate(self, recipe):
