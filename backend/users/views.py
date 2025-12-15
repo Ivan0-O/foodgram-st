@@ -76,14 +76,14 @@ class UserViewSet(djoser_views.UserViewSet):
         methods=["post", "delete"],
         serializer_class=UserWithRecipesSerializer,
     )
-    def subscribe(self, request, id):
+    def subscribe(self, request, pk):
         # not allowing subscribing to yourself
-        id = int(id)
-        if id == request.user.id:
+        pk = int(pk)
+        if pk == request.user.pk:
             return Response(data={"detail": "Cannot subscribe to yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        sub_to = get_object_or_404(User, pk=id)
+        sub_to = get_object_or_404(User, pk=pk)
         sub, created = Subscription.objects.get_or_create(
             subscriber=request.user, subscribed_to=sub_to)
 

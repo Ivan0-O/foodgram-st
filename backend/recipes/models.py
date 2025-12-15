@@ -44,3 +44,19 @@ class RecipeIngredient(models.Model):
             f"{self.amount.__str__()} {(self.ingredient
                                         .measurement_unit.__str__())}"
         )
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name="favorites")
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name="favorited_by")
+
+    class Meta:
+        unique_together = ("user", "recipe")
+
+    def __str__(self):
+        return (f"{self.subscriber.username.__str__()} favorites "
+                f"{self.subscribed_to.username.__str__()}")

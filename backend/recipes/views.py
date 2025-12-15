@@ -7,8 +7,9 @@ from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Ingredient, Recipe
-from .serializers import IngredientSerializer, RecipeSerializer
+from .models import Ingredient, Recipe, Favorite
+from .serializers import (IngredientSerializer, RecipeSerializer,
+                          RecipeShortSerialzier)
 from core.permissions import IsAuthorOrReadOnly
 from shortlinks.models import ShortLink
 from shortlinks.serializers import ShortLinkSerializer
@@ -54,3 +55,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
         link, _ = ShortLink.objects.get_or_create(recipe=recipe)
         serializer = self.get_serializer(link)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["post", "delete"],
+        permission_classes=[permissions.IsAuthenticated],
+        serializer_class=RecipeShortSerialzier,
+    )
+    def favorite(self, request, pk):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        fav, created = Favorite.objects.get_or_create(user=request.user,
+                                                      recipe=recipe)
+
+        # DELETE
+        if request.method == "DELETE":
+            fav.delete()
+            if created:
+                return Response(
+                    data={"detail": "This recipe is not in your favorites."},
+                    status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+
+        # POST
+        # already in favs
+        if not created:
+            return Response(
+                data={"detail": "This recipe is already in your favorites."},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(recipe)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
