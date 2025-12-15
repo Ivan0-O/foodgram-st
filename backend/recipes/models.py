@@ -40,7 +40,7 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return (
-            f"{self.recipe.__str__()}: {self.ingredient.name.__str__()}"
+            f"{self.recipe.__str__()}: {self.ingredient.name.__str__()} "
             f"{self.amount.__str__()} {(self.ingredient
                                         .measurement_unit.__str__())}"
         )
@@ -58,5 +58,21 @@ class Favorite(models.Model):
         unique_together = ("user", "recipe")
 
     def __str__(self):
-        return (f"{self.subscriber.username.__str__()} favorites "
-                f"{self.subscribed_to.username.__str__()}")
+        return (f"{self.user.username.__str__()} favorites "
+                f"{self.recipe.__str__()}")
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name="shopping_cart")
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name="in_shopping_cart_of")
+
+    class Meta:
+        unique_together = ("user", "recipe")
+
+    def __str__(self):
+        return (f"{self.recipe.__str__()} is in shopping cart of "
+                f"{self.user.username.__str__()}")
