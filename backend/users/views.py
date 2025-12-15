@@ -93,7 +93,7 @@ class UserViewSet(djoser_views.UserViewSet):
             if created:
                 return Response(
                     data={"detail": "Not subscribed to that user."},
-                    status=status.HTTP_404_NOT_FOUND)
+                    status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(status=status.HTTP_204_NO_CONTENT)
 

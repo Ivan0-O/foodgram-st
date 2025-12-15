@@ -6,7 +6,6 @@ from rest_framework import serializers
 from rest_framework import validators
 
 from .models import Avatar, Subscription
-from recipes.models import Recipe
 from core.serializers import Base64ImageField
 
 User = get_user_model()
