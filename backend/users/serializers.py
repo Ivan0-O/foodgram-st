@@ -65,27 +65,40 @@ class UserSerializer(UserShortSerializer):
     class Meta(UserShortSerializer.Meta):
         fields = UserShortSerializer.Meta.fields + ("is_subscribed", "avatar")
 
-    def get_is_subscribed(self, sub_to):
+    def get_is_subscribed(self, other_user):
         request = self.context.get("request")
         if request is None or request.user.is_anonymous:
             return False
 
         return Subscription.objects.filter(subscriber=request.user,
-                                           subscribed_to=sub_to).exists()
+                                           subscribed_to=other_user).exists()
 
 
 class UserWithRecipesSerializer(UserSerializer):
     # local import to resolve circular dependency
     from recipes.serializers import RecipeShortSerialzier
 
-    recipes = RecipeShortSerialzier(read_only=True, many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ("recipes", "recipes_count")
 
-    def get_recipes_count(self, sub_to):
-        return sub_to.recipes.count()
+    def get_recipes(self, other_user):
+        recipes = other_user.recipes.all()
+        limit = self.context.get("request").query_params.get(
+            "recipes_limit", None)
+        if limit is not None:
+            limit = int(limit)
+            recipes = recipes[:limit]
+
+        serializer = self.RecipeShortSerialzier(instance=recipes,
+                                                many=True,
+                                                context=self.context)
+        return serializer.data
+
+    def get_recipes_count(self, other_user):
+        return other_user.recipes.count()
 
 
 # Requires email+password combination instead of default username+password

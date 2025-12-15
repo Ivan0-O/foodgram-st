@@ -78,6 +78,7 @@ class UserViewSet(djoser_views.UserViewSet):
     )
     def subscribe(self, request, id):
         # not allowing subscribing to yourself
+        id = int(id)
         if id == request.user.id:
             return Response(data={"detail": "Cannot subscribe to yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
