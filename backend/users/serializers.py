@@ -12,7 +12,7 @@ User = get_user_model()
 
 
 class AvatarSerializer(serializers.ModelSerializer):
-    avatar = Base64ImageField(write_only=True, required=True)
+    avatar = Base64ImageField(source="image")
 
     class Meta:
         model = Avatar
