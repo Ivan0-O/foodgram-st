@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 
-from rest_framework import (viewsets, mixins, permissions, pagination, filters,
-                            status)
+from rest_framework import viewsets, mixins, permissions, pagination, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -11,6 +10,7 @@ from .models import (Ingredient, Recipe, RecipeIngredient, Favorite,
                      ShoppingCart)
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeShortSerialzier)
+from .filters import RecipeFilter
 from core.permissions import IsAuthorOrReadOnly
 from shortlinks.models import ShortLink
 from shortlinks.serializers import ShortLinkSerializer
@@ -36,10 +36,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     ]
     pagination_class = pagination.LimitOffsetPagination
 
-    filter_backends = [
-        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
-    ]
-    filterset_fields = ('author', )
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RecipeFilter
+    filterset_fields = ("author",)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
