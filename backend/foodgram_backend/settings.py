@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,11 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ("django-insecure-i1d^n(q8gkw*574@d*"
-              "e0hz5b9y!ym-zxq8vzgh1#bv4*uv1skh")
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-i1d^n(q8gkw*574@d*e0hz5b9y!ym-zxq8vzgh1#bv4*uv1skh")
 
-# SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv("DEBUG", True)
 
 ALLOWED_HOSTS = []
 
@@ -41,7 +43,7 @@ INSTALLED_APPS = [
     "rest_framework",
     # Djoser
     "djoser",
-    # My apps
+    # Apps
     "core.apps.CoreConfig",
     "users.apps.UsersConfig",
     "recipes.apps.RecipesConfig",
@@ -63,7 +65,7 @@ ROOT_URLCONF = "foodgram_backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -75,20 +77,26 @@ TEMPLATES = [
     },
 ]
 
-if DEBUG:
-    TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
-
 WSGI_APPLICATION = "foodgram_backend.wsgi.application"
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -117,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -158,8 +166,6 @@ DJOSER = {
         "token_create": "users.serializers.TokenCreateSerializer",
     },
     "PERMISSIONS": {
-        # "user": ["djoser.permissions.CurrentUserOrAdminOrReadOnly"],
-        # "user_list": ["djoser.permissions.CurrentUserOrAdminOrReadOnly"],
         "user": ["rest_framework.permissions.IsAuthenticatedOrReadOnly"],
         "user_list": ["rest_framework.permissions.IsAuthenticatedOrReadOnly"],
     },
