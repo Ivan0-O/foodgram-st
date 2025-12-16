@@ -3,6 +3,8 @@ from django_filters import filters
 
 from django.db.models import Q
 
+from .models import Recipe
+
 BOOL = (
     ("1", "True"),
     ("True", "True"),
@@ -40,18 +42,26 @@ class RecipeFilter(FilterSet):
     is_in_shopping_cart = filters.TypedChoiceFilter(
         choices=BOOL, coerce=bool_coerce, method="filter_is_in_shopping_cart")
 
+    class Meta:
+        model = Recipe
+        fields = ("is_favorited", "is_in_shopping_cart", "author")
+
     def filter_is_favorited(self, queryset, name, value):
+        if not self.request.user.is_authenticated:
+            return queryset
+
         filter = Q(favorited_by__user=self.request.user)
         if not value:
             filter = ~filter
 
-        print(queryset.filter(filter))
         return queryset.filter(filter)
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
+        if not self.request.user.is_authenticated:
+            return queryset
+
         filter = Q(in_shopping_cart_of__user=self.request.user)
         if not value:
             filter = ~filter
 
-        print(queryset.filter(filter))
         return queryset.filter(filter)

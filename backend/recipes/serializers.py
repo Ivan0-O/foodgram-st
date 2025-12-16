@@ -128,10 +128,14 @@ class RecipeSerializer(RecipeShortSerialzier):
 
         return recipe
 
+    def _user_recipe_getter_mixin(self, recipe, model):
+        user = self.context.get("request").user
+        if not user.is_authenticated:
+            return False
+        return model.objects.filter(user=user, recipe=recipe).exists()
+
     def get_is_favorited(self, recipe):
-        return Favorite.objects.filter(user=self.context.get("request").user,
-                                       recipe=recipe).exists()
+        return self._user_recipe_getter_mixin(recipe, Favorite)
 
     def get_is_in_shopping_cart(self, recipe):
-        return ShoppingCart.objects.filter(
-            user=self.context.get("request").user, recipe=recipe).exists()
+        return self._user_recipe_getter_mixin(recipe, ShoppingCart)
