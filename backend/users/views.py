@@ -5,12 +5,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.shortcuts import get_object_or_404
-
 from djoser import views as djoser_views
 
 from .models import Avatar, Subscription
 from .serializers import AvatarSerializer, UserWithRecipesSerializer
+from core.decorators import many2many_relation_action
 
 User = get_user_model()
 
@@ -71,8 +70,15 @@ class UserViewSet(djoser_views.UserViewSet):
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(data=serializer.data)
 
-    @action(
-        detail=True,
+    @many2many_relation_action(
+        model=User,
+        rel_model=Subscription,
+        usr_field="subscriber",
+        model_field="subscribed_to",
+        post_exists_message="Not subscribed to that user.",
+        delete_missing_message="Not subscribed to that user.",
+
+        # action kwargs
         methods=["post", "delete"],
         serializer_class=UserWithRecipesSerializer,
     )
@@ -82,27 +88,3 @@ class UserViewSet(djoser_views.UserViewSet):
         if id == request.user.id:
             return Response(data={"detail": "Cannot subscribe to yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
-
-        sub_to = get_object_or_404(User, pk=id)
-        sub, created = Subscription.objects.get_or_create(
-            subscriber=request.user, subscribed_to=sub_to)
-
-        # DELETE
-        if request.method == "DELETE":
-            sub.delete()
-            if created:
-                return Response(
-                    data={"detail": "Not subscribed to that user."},
-                    status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response(status=status.HTTP_204_NO_CONTENT)
-
-        # POST
-        # already subscribed
-        if not created:
-            return Response(
-                data={"detail": "You are already subscribed to that user."},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = self.get_serializer(sub_to)
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
