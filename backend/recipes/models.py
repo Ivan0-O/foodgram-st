@@ -5,8 +5,13 @@ User = get_user_model()
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=128)
-    measurement_unit = models.CharField(max_length=64)
+    name = models.CharField(max_length=128, verbose_name="Название")
+    measurement_unit = models.CharField(
+        max_length=64, verbose_name="Единица измерения")
+
+    class Meta:
+        verbose_name = "ингредиент"
+        verbose_name_plural = "Ингредиенты"
 
     def __str__(self):
         return f"{self.name} ({self.measurement_unit})"
@@ -15,16 +20,23 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(User,
                                related_name="recipes",
-                               on_delete=models.CASCADE)
-    name = models.CharField(max_length=256)
+                               on_delete=models.CASCADE,
+                               verbose_name="Автор")
+    name = models.CharField(max_length=256, verbose_name="Название")
     image = models.ImageField(
         upload_to="recipes/images/",
         null=True,
         default=None,
+        verbose_name="Изображение",
     )
-    text = models.TextField()  # description
+    text = models.TextField(verbose_name="Описание")  # description
 
-    cooking_time = models.PositiveIntegerField()  # in minutes
+    cooking_time = models.PositiveIntegerField(
+        verbose_name="Время приготовления")  # in minutes
+
+    class Meta:
+        verbose_name = "рецепт"
+        verbose_name_plural = "Рецепты"
 
     def __str__(self):
         return self.name.__str__()
