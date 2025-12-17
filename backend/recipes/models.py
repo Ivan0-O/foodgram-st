@@ -9,7 +9,7 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(max_length=64)
 
     def __str__(self):
-        return f"{self.name} ({self.measure})"
+        return f"{self.name} ({self.measurement_unit})"
 
 
 class Recipe(models.Model):
