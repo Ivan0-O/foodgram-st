@@ -11,6 +11,7 @@ from .models import (Ingredient, Recipe, RecipeIngredient, Favorite,
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeShortSerialzier)
 from .filters import RecipeFilter
+from .pagination import PageLimitPagination
 
 from core.permissions import IsAuthorOrReadOnly
 from core.decorators import many2many_relation_action
@@ -36,7 +37,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly
     ]
-    pagination_class = pagination.LimitOffsetPagination
+    pagination_class = PageLimitPagination
 
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
@@ -119,6 +120,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         response = HttpResponse(
             file, content_type="text/plain;charset=utf-8")
-        response["Content-Disposition"] = (
-            "attachment;filename=\"shopping_list.txt\"")
         return response
