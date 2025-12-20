@@ -30,7 +30,7 @@ class IngredientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
 
     def get_queryset(self):
         name = self.request.query_params.get("name", "")
-        return super().get_queryset().filter(name__startswith=name)
+        return super().get_queryset().filter(name__istartswith=name)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
