@@ -17,9 +17,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ShortLink',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('slug', models.SlugField(default=shortlinks.models.create_slug, editable=False, max_length=8, unique=True)),
-                ('recipe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='short_link', to='recipes.recipe')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('slug', models.SlugField(default=shortlinks.models.create_slug,
+                 editable=False, max_length=8, unique=True)),
+                ('recipe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='short_link', to='recipes.recipe')),
             ],
         ),
     ]

@@ -15,16 +15,19 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='ingredient',
-            options={'verbose_name': 'ингредиент', 'verbose_name_plural': 'Ингредиенты'},
+            options={'verbose_name': 'ингредиент',
+                     'verbose_name_plural': 'Ингредиенты'},
         ),
         migrations.AlterModelOptions(
             name='recipe',
-            options={'verbose_name': 'рецепт', 'verbose_name_plural': 'Рецепты'},
+            options={'verbose_name': 'рецепт',
+                     'verbose_name_plural': 'Рецепты'},
         ),
         migrations.AlterField(
             model_name='ingredient',
             name='measurement_unit',
-            field=models.CharField(max_length=64, verbose_name='Единица измерения'),
+            field=models.CharField(
+                max_length=64, verbose_name='Единица измерения'),
         ),
         migrations.AlterField(
             model_name='ingredient',
@@ -34,17 +37,20 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='recipe',
             name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recipes', to=settings.AUTH_USER_MODEL, verbose_name='Автор'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='recipes', to=settings.AUTH_USER_MODEL, verbose_name='Автор'),
         ),
         migrations.AlterField(
             model_name='recipe',
             name='cooking_time',
-            field=models.PositiveIntegerField(verbose_name='Время приготовления'),
+            field=models.PositiveIntegerField(
+                verbose_name='Время приготовления'),
         ),
         migrations.AlterField(
             model_name='recipe',
             name='image',
-            field=models.ImageField(default=None, null=True, upload_to='recipes/images/', verbose_name='Изображение'),
+            field=models.ImageField(
+                default=None, null=True, upload_to='recipes/images/', verbose_name='Изображение'),
         ),
         migrations.AlterField(
             model_name='recipe',
