@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.http import HttpResponse
 
 from djoser import views as djoser_views
@@ -22,7 +22,6 @@ from .filters import RecipeFilter
 from .pagination import PageLimitPagination
 
 from .permissions import IsAuthorOrReadOnly
-from .decorators import many2many_relation_action
 from shortlinks.models import ShortLink
 
 
@@ -79,21 +78,19 @@ class UserViewSet(djoser_views.UserViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def subscriptions(self, request):
-        sub_to = User.objects.filter(subscribers__subscriber=request.user)
+        sub_to = (
+            User.objects
+            .filter(subscribers__subscriber=request.user)
+            .annotate(recipe_count=Count("recipes"))
+        )
         # serialize only a single page
         page = self.paginate_queryset(sub_to)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(data=serializer.data)
 
-    @many2many_relation_action(
-        model=User,
-        rel_model=Subscription,
-        usr_field="subscriber",
-        model_field="subscribed_to",
-        post_exists_message="Not subscribed to that user.",
-        delete_missing_message="Not subscribed to that user.",
-
-        # action kwargs
+    # TODO: extract
+    @action(
+        detail=True,
         methods=["post", "delete"],
         serializer_class=UserWithRecipesSerializer,
     )
@@ -103,6 +100,50 @@ class UserViewSet(djoser_views.UserViewSet):
         if id == request.user.id:
             return Response(data={"detail": "Cannot subscribe to yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
+
+        sub_to = get_object_or_404(User, pk=id)
+        sub, created = Subscription.objects.get_or_create(
+            subscriber=request.user, subscribed_to=sub_to)
+
+        # DELETE
+        if request.method == "DELETE":
+            sub.delete()
+            if created:
+                return Response(
+                    data={"detail": "Not subscribed to that user."},
+                    status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+
+        # POST
+        # already subscribed
+        if not created:
+            return Response(
+                data={"detail": "You are already subscribed to that user."},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(sub_to)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    # @action(
+    #     detail=True,
+    #     methods=["post", "delete"],
+    #     serializer_class=UserWithRecipesSerializer,
+    # )
+    # def subscribe(self, request, id):
+    #     # not allowing subscribing to yourself
+    #     id = int(id)
+    #     if id == request.user.id:
+    #         return Response(data={"detail": "Cannot subscribe to yourself."},
+    #                         status=status.HTTP_400_BAD_REQUEST)
+    #
+    #     return _many2many_relation(
+    #         self, request, User, Subscription, id,
+    #         user_field="subscriber",
+    #         model_field="subscribed_to",
+    #         post_exists_message="Not subscribed to that user.",
+    #         delete_missing_message="Not subscribed to that user.",
+    #     )
 
 
 class IngredientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
@@ -147,37 +188,105 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(link)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-    @many2many_relation_action(
-        model=Recipe,
-        rel_model=Favorite,
-        usr_field="user",
-        model_field="recipe",
-        post_exists_message="This recipe is already in your favorites.",
-        delete_missing_message="This recipe is not in your favorites.",
+    # @action(
+    #     detail=True,
+    #     methods=["post", "delete"],
+    #     permission_classes=[permissions.IsAuthenticated],
+    #     serializer_class=RecipeShortSerialzier,
+    # )
+    # def favorite(self, request, pk):
+    #     return _many2many_relation(
+    #         self, request, Recipe, Favorite, pk,
+    #         user_field="user",
+    #         model_field="recipe",
+    #         post_exists_message=(
+    #             "This recipe is already in your favorites."),
+    #         delete_missing_message=(
+    #             "This recipe is not in your favorites."),
+    #     )
 
-        # action kwargs
+    # TODO: extract
+    @action(
+        detail=True,
         methods=["post", "delete"],
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=RecipeShortSerialzier,
     )
     def favorite(self, request, pk):
-        pass
+        recipe = get_object_or_404(Recipe, pk=pk)
+        fav, created = Favorite.objects.get_or_create(user=request.user,
+                                                      recipe=recipe)
 
-    @many2many_relation_action(
-        model=Recipe,
-        rel_model=ShoppingCart,
-        usr_field="user",
-        model_field="recipe",
-        post_exists_message="This recipe is already in your shopping cart.",
-        delete_missing_message="This recipe is not in your shopping cart.",
+        # DELETE
+        if request.method == "DELETE":
+            fav.delete()
+            if created:
+                return Response(
+                    data={"detail": "This recipe is not in your favorites."},
+                    status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # action kwargs
+        # POST
+        # already in favs
+        if not created:
+            return Response(
+                data={"detail": "This recipe is already in your favorites."},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(recipe)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    # TODO: extract
+    @action(
+        detail=True,
         methods=["post", "delete"],
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=RecipeShortSerialzier,
     )
     def shopping_cart(self, request, pk):
-        pass
+        recipe = get_object_or_404(Recipe, pk=pk)
+        cart, created = ShoppingCart.objects.get_or_create(user=request.user,
+                                                           recipe=recipe)
+
+        # DELETE
+        if request.method == "DELETE":
+            cart.delete()
+            if created:
+                return Response(data={
+                    "detail":
+                    "This recipe is not in your shopping cart."
+                },
+                    status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+
+        # POST
+        # already in shopping cart
+        if not created:
+            return Response(data={
+                "detail":
+                "This recipe is already in your shopping cart."
+            },
+                status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(recipe)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    # @action(
+    #     detail=True,
+    #     methods=["post", "delete"],
+    #     permission_classes=[permissions.IsAuthenticated],
+    #     serializer_class=RecipeShortSerialzier,
+    # )
+    # def shopping_cart(self, request, pk):
+    #     return _many2many_relation(
+    #         self, request, Recipe, ShoppingCart, pk,
+    #         user_field="user",
+    #         model_field="recipe",
+    #         post_exists_message="This recipe is already in your shopping cart.",
+    #         delete_missing_message="This recipe is not in your shopping cart.",
+    #     )
 
     @action(
         detail=False,
