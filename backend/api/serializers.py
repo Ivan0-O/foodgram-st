@@ -105,9 +105,9 @@ class UserWithRecipesSerializer(UserSerializer):
             limit = int(limit)
             recipes = recipes[:limit]
 
-        serializer = self.RecipeShortSerialzier(instance=recipes,
-                                                many=True,
-                                                context=self.context)
+        serializer = RecipeShortSerialzier(instance=recipes,
+                                           many=True,
+                                           context=self.context)
         return serializer.data
 
     def get_recipes_count(self, other_user):
