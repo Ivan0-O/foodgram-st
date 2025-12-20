@@ -128,6 +128,7 @@ class TokenCreateSerializer(djoser_serializers.TokenCreateSerializer):
 
         # finding the user
         try:
+            # Can't use get_object_404 because the code 400 is required
             self.user = User.objects.get(email=attrs.get("email", None))
         except Exception:
             raise cred_err
@@ -233,6 +234,7 @@ class RecipeSerializer(RecipeShortSerialzier):
             id = ingredient_data.get("id")
             amount = ingredient_data.get("amount")
 
+            # Can't use get_object_404 because the code 400 is required
             try:
                 ingredient = Ingredient.objects.get(pk=id)
 

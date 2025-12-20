@@ -58,14 +58,9 @@ class UserViewSet(djoser_views.UserViewSet):
         # DELETE
         # generic delete thing
         if request.method == "DELETE":
-            try:
-                avatar = user.avatar
-                avatar.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-
-            except Avatar.DoesNotExist:
-                return Response(data={"detail": "You do not have an avatar."},
-                                status=status.HTTP_404_NOT_FOUND)
+            avatar = get_object_or_404(Avatar, user=user)
+            avatar.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         # POST
         avatar, created = Avatar.objects.get_or_create(user=user)
