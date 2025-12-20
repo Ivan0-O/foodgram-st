@@ -92,7 +92,7 @@ class UserSerializer(UserShortSerializer):
 
 class UserWithRecipesSerializer(UserSerializer):
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.IntegerField(read_only=True)
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ("recipes", "recipes_count")
@@ -109,9 +109,6 @@ class UserWithRecipesSerializer(UserSerializer):
                                            many=True,
                                            context=self.context)
         return serializer.data
-
-    def get_recipes_count(self, other_user):
-        return other_user.recipes.count()
 
 
 # Requires email+password combination instead of default username+password

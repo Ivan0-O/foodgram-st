@@ -29,7 +29,12 @@ User = get_user_model()
 
 
 class UserViewSet(djoser_views.UserViewSet):
-    queryset = User.objects.all().order_by("username")
+    queryset = (
+        User.objects
+        .all()
+        .order_by("username")
+        .annotate(recipes_count=Count("recipes"))
+    )
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = pagination.LimitOffsetPagination
 
@@ -79,9 +84,8 @@ class UserViewSet(djoser_views.UserViewSet):
     )
     def subscriptions(self, request):
         sub_to = (
-            User.objects
+            self.get_queryset()
             .filter(subscribers__subscriber=request.user)
-            .annotate(recipe_count=Count("recipes"))
         )
         # serialize only a single page
         page = self.paginate_queryset(sub_to)
@@ -101,7 +105,7 @@ class UserViewSet(djoser_views.UserViewSet):
             return Response(data={"detail": "Cannot subscribe to yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        sub_to = get_object_or_404(User, pk=id)
+        sub_to = get_object_or_404(self.get_queryset(), pk=id)
         sub, created = Subscription.objects.get_or_create(
             subscriber=request.user, subscribed_to=sub_to)
 
