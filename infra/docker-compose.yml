@@ -12,12 +12,9 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    container_name: foodgram-back
-    build: ../backend/
+    image: ivan0o/foodgram_backend:latest
     env_file: ../.env
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ../backend/:/app/ # remove in prod
       - media:/app/media/
       - static:/static/
     depends_on:
