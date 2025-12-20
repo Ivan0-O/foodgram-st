@@ -73,6 +73,7 @@ jobs:
         run: |
           cd frontend/
           npm install
+          npm install @testing-library/dom@latest
       - name: Test frontend
         run: |
           cd frontend/
