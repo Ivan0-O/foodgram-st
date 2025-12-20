@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Sum
+from django.http import HttpResponse
 
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
@@ -99,11 +101,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def download_shopping_cart(self, request):
-        # the beggining of the file is already convoluted enough
-        from django.db.models import Sum
-        from django.http import HttpResponse
-
-        recipes = ShoppingCart.objects.filter(user=request.user).values("id")
+        recipes = ShoppingCart.objects.filter(
+            user=request.user).values("recipe")
 
         # select ingredients for all the recipes
         content = RecipeIngredient.objects.filter(recipe__in=recipes).values(
@@ -121,6 +120,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                              f"({ingredient["ingredient__measurement_unit"]})"
                              for ingredient in content)
 
-        response = HttpResponse(
-            file, content_type="text/plain;charset=utf-8")
+        response = HttpResponse(file, content_type="text/plain; charset=utf-8")
+        response["Content-Disposition"] = (
+            "attachment; filename=\"shopping_list.txt\"")
         return response

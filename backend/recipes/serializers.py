@@ -108,15 +108,18 @@ class RecipeSerializer(RecipeShortSerialzier):
         # create the recipe as normal
         recipe = Recipe.objects.create(**validated_data)
 
-        self._push_ingredients(recipe, self.initial_data.get("ingredients"))
+        try:
+            self._push_ingredients(recipe,
+                                   self.initial_data.get("ingredients"))
+        except serializers.ValidationError as err:
+            recipe.delete()
+            raise err
 
         return recipe
 
     def update(self, recipe, validated_data):
         # we handle it ourselves
         validated_data.pop("recipe_ingredients", None)
-        # update all the other fields as normal
-        recipe = super().update(recipe, validated_data)
 
         # update ingredients only if they were provided
         ingredients = self.initial_data.get("ingredients")
@@ -125,6 +128,9 @@ class RecipeSerializer(RecipeShortSerialzier):
             RecipeIngredient.objects.filter(recipe=recipe).delete()
 
             self._push_ingredients(recipe, ingredients)
+
+        # update all the other fields as normal
+        recipe = super().update(recipe, validated_data)
 
         return recipe
 
