@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -33,6 +34,8 @@ class Recipe(models.Model):
 
     cooking_time = models.PositiveIntegerField(
         verbose_name="Время приготовления")  # in minutes
+
+    published = models.DateTimeField("Дата публикации", auto_now_add=True)
 
     class Meta:
         verbose_name = "рецепт"

@@ -46,7 +46,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
-        return self.queryset.order_by("name")
+        return self.queryset.order_by("-published")
 
     @action(
         detail=True,
