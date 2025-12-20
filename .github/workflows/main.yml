@@ -73,7 +73,7 @@ jobs:
         run: |
           cd frontend/
           npm install
-          npm install @testing-library/dom@latest
+          npm install @testing-library/dom@7.29.6 --legacy-peer-deps
       - name: Test frontend
         run: |
           cd frontend/
