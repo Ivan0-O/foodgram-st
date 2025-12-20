@@ -3,7 +3,7 @@ from django_filters import filters
 
 from django.db.models import Q
 
-from .models import Recipe
+from recipes.models import Recipe
 
 BOOL = (
     ("1", "True"),
