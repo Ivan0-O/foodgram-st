@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum, Count, Value, Exists, OuterRef
+from django.db.models import Sum, Count
 from django.http import HttpResponse
 
 from djoser import views as djoser_views
@@ -145,17 +145,17 @@ class UserViewSet(djoser_views.UserViewSet):
 
 class IngredientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                         viewsets.GenericViewSet):
-    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = None
 
     def get_queryset(self):
         name = self.request.query_params.get("name", "")
-        return super().get_queryset().filter(name__istartswith=name)
+        return Ingredient.objects.filter(name__istartswith=name)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.order_by("-published")
     serializer_class = RecipeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly
@@ -167,21 +167,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-    def get_queryset(self):
-        queryset = Recipe.objects.order_by("-published")
-        user = self.request.user
-
-        if not user.is_authenticated:
-            return queryset.annotate(is_favorited=Value(
-                False), is_in_shopping_cart=Value(False))
-
-        return queryset.annotate(
-            is_favorited=Exists(Favorite.objects.filter(
-                user=user, recipe=OuterRef("pk"))),
-            is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
-                user=user, recipe=OuterRef("pk"))),
-        )
 
     @action(
         detail=True,
