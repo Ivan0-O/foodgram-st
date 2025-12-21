@@ -1,13 +1,22 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from foodgram_backend.constants import (
+    INGREDIENT_NAME_MAX_LENGTH,
+    INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
+    RECIPE_NAME_MAX_LENGTH,
+    RECIPE_IMAGE_UPLOAD_PATH
+)
+
 User = get_user_model()
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=128, verbose_name="Название")
+    name = models.CharField(
+        max_length=INGREDIENT_NAME_MAX_LENGTH, verbose_name="Название")
     measurement_unit = models.CharField(
-        max_length=64, verbose_name="Единица измерения")
+        max_length=INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
+        verbose_name="Единица измерения")
 
     class Meta:
         verbose_name = "ингредиент"
@@ -22,17 +31,18 @@ class Recipe(models.Model):
                                related_name="recipes",
                                on_delete=models.CASCADE,
                                verbose_name="Автор")
-    name = models.CharField(max_length=256, verbose_name="Название")
+    name = models.CharField(
+        max_length=RECIPE_NAME_MAX_LENGTH, verbose_name="Название")
     image = models.ImageField(
-        upload_to="recipes/images/",
+        upload_to=RECIPE_IMAGE_UPLOAD_PATH,
         null=True,
         default=None,
         verbose_name="Изображение",
     )
-    text = models.TextField(verbose_name="Описание")  # description
+    text = models.TextField(verbose_name="Описание")
 
     cooking_time = models.PositiveIntegerField(
-        verbose_name="Время приготовления")  # in minutes
+        verbose_name="Время приготовления")
 
     published = models.DateTimeField("Дата публикации", auto_now_add=True)
 
