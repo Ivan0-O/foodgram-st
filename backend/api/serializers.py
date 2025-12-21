@@ -229,7 +229,7 @@ class RecipeSerializer(RecipeShortSerialzier):
 
         return super().validate(recipe)
 
-    def _push_ingredients(self, recipe, ingredients):
+    def _create_ingredients(self, recipe, ingredients):
         for ingredient_data in ingredients:
             id = ingredient_data.get("id")
             amount = ingredient_data.get("amount")
@@ -260,8 +260,8 @@ class RecipeSerializer(RecipeShortSerialzier):
         recipe = Recipe.objects.create(**validated_data)
 
         try:
-            self._push_ingredients(recipe,
-                                   self.initial_data.get("ingredients"))
+            self._create_ingredients(recipe,
+                                     self.initial_data.get("ingredients"))
         except serializers.ValidationError as err:
             recipe.delete()
             raise err
@@ -278,7 +278,7 @@ class RecipeSerializer(RecipeShortSerialzier):
             # delete the old ones
             RecipeIngredient.objects.filter(recipe=recipe).delete()
 
-            self._push_ingredients(recipe, ingredients)
+            self._create_ingredients(recipe, ingredients)
 
         # update all the other fields as normal
         recipe = super().update(recipe, validated_data)
