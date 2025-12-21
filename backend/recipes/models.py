@@ -55,7 +55,7 @@ class Recipe(models.Model):
         verbose_name_plural = "Рецепты"
 
     def __str__(self):
-        return self.name.__str__()
+        return self.name
 
 
 class RecipeIngredient(models.Model):
@@ -68,9 +68,9 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return (
-            f"{self.recipe.__str__()}: {self.ingredient.name.__str__()} "
-            f"{self.amount.__str__()} {(self.ingredient
-                                        .measurement_unit.__str__())}"
+            f"{self.recipe}: {self.ingredient.name} "
+            f"{self.amount} {(self.ingredient
+                                        .measurement_unit)}"
         )
 
 
@@ -86,8 +86,8 @@ class Favorite(models.Model):
         unique_together = ("user", "recipe")
 
     def __str__(self):
-        return (f"{self.user.username.__str__()} favorites "
-                f"{self.recipe.__str__()}")
+        return (f"{self.user.username} favorites "
+                f"{self.recipe}")
 
 
 class ShoppingCart(models.Model):
@@ -102,5 +102,5 @@ class ShoppingCart(models.Model):
         unique_together = ("user", "recipe")
 
     def __str__(self):
-        return (f"{self.recipe.__str__()} is in shopping cart of "
-                f"{self.user.username.__str__()}")
+        return (f"{self.recipe} is in shopping cart of "
+                f"{self.user.username}")
