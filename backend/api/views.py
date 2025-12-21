@@ -284,31 +284,40 @@ class RecipeViewSet(viewsets.ModelViewSet):
     #         delete_missing_message="This recipe is not in your shopping cart.",
     #     )
 
+    def _create_shopping_list_file(self, user):
+        recipes = (
+            ShoppingCart.objects
+            .filter(user=user)
+            .values("recipe")
+        )
+
+        # select ingredients for all the recipes
+        ingredients = (
+            RecipeIngredient.objects
+            .filter(recipe__in=recipes)
+            .values("ingredient__name", "ingredient__measurement_unit")
+        )
+        # add amount field that is the sum of all the occurences
+        # of the given ingredient
+        ingredients = ingredients.annotate(
+            total_amount=Sum("amount")).order_by("ingredient__name")
+
+        if not ingredients:
+            file = "Your shopping cart is empty."
+        else:
+            file = "\n".join(f"{ingredient["ingredient__name"]}: "
+                             f"{int(ingredient["total_amount"])} "
+                             f"({ingredient["ingredient__measurement_unit"]})"
+                             for ingredient in ingredients)
+        return file
+
     @action(
         detail=False,
         methods=["get"],
         permission_classes=[permissions.IsAuthenticated],
     )
     def download_shopping_cart(self, request):
-        recipes = ShoppingCart.objects.filter(
-            user=request.user).values("recipe")
-
-        # select ingredients for all the recipes
-        content = RecipeIngredient.objects.filter(recipe__in=recipes).values(
-            "ingredient__name", "ingredient__measurement_unit")
-        # add amount field that is the sum of all the occurences
-        # of the given ingredient
-        content = content.annotate(
-            total_amount=Sum("amount")).order_by("ingredient__name")
-
-        if not content:
-            file = "Your shopping cart is empty."
-        else:
-            file = "\n".join(f"{ingredient["ingredient__name"]}: "
-                             f"{int(ingredient["total_amount"])} "
-                             f"({ingredient["ingredient__measurement_unit"]})"
-                             for ingredient in content)
-
+        file = self._create_shopping_list_file(request.user)
         response = HttpResponse(file, content_type="text/plain; charset=utf-8")
         response["Content-Disposition"] = (
             "attachment; filename=\"shopping_list.txt\"")
