@@ -154,7 +154,10 @@ class IngredientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.order_by("-published")
+    queryset = Recipe.objects.select_related("author").prefetch_related(
+        "recipe_ingredients",
+        "recipe_ingredients__ingredient"
+    ).order_by("-published")
     serializer_class = RecipeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly
