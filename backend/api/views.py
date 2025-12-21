@@ -93,7 +93,10 @@ class UserViewSet(djoser_views.UserViewSet):
         serializer_class=UserWithRecipesSerializer,
     )
     def subscribe(self, request, id):
-        # not allowing subscribing to yourself
+        # int(id) is required because django passes it as a string
+        # this check will otherwise always pass because str == int
+        # is always false
+        id = int(id)
         if id == request.user.id:
             return Response(data={"detail": "Cannot subscribe to yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
