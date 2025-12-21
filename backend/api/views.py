@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum, Count
 from django.http import HttpResponse
@@ -11,7 +10,7 @@ from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from users.models import Avatar, Subscription
+from users.models import User, Subscription
 from recipes.models import (Ingredient, Recipe, RecipeIngredient, Favorite,
                             ShoppingCart)
 
@@ -22,9 +21,6 @@ from .filters import RecipeFilter, IngredientFilter
 from .pagination import PageLimitPagination
 
 from .permissions import IsAuthorOrReadOnly
-
-
-User = get_user_model()
 
 
 class UserViewSet(djoser_views.UserViewSet):
@@ -53,21 +49,24 @@ class UserViewSet(djoser_views.UserViewSet):
     def avatar(self, request):
         user = request.user
 
+        # PUT
+        if request.method == "PUT":
+            serializer = self.get_serializer(user, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
         # DELETE
-        # generic delete thing
-        if request.method == "DELETE":
-            avatar = get_object_or_404(Avatar, user=user)
-            avatar.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        if not user.avatar:
+            return Response(
+                {"detail": "You do not have an avatar."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-        # POST
-        avatar, created = Avatar.objects.get_or_create(user=user)
-
-        serializer = self.get_serializer(avatar, data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        user.avatar.delete(save=False)
+        user.avatar = None
+        user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False,

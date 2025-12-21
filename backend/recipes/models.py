@@ -1,16 +1,15 @@
 import random
 import string
 
-from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
+
+from users.models import User
 
 from foodgram_backend.constants import (INGREDIENT_NAME_MAX_LENGTH,
                                         INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
                                         RECIPE_NAME_MAX_LENGTH,
                                         RECIPE_IMAGE_UPLOAD_PATH)
-
-User = get_user_model()
 
 
 class Ingredient(models.Model):

@@ -1,17 +1,19 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-User = get_user_model()
 
+class User(AbstractUser):
+    # make email unique
+    email = models.EmailField(unique=True, max_length=254)
+    avatar = models.ImageField(verbose_name="Аватар",
+                               upload_to="users/",
+                               null=True,
+                               blank=True,
+                               default=None)
 
-class Avatar(models.Model):
-    user = models.OneToOneField(User,
-                                related_name="avatar",
-                                on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="users/", null=True, default=None)
-
-    def __str__(self):
-        return f"{self.user.username.__str__()} avatar"
+    class Meta(AbstractUser.Meta):
+        verbose_name = "пользователь"
+        verbose_name_plural = "Пользователи"
 
 
 class Subscription(models.Model):
@@ -26,5 +28,5 @@ class Subscription(models.Model):
         unique_together = ("subscriber", "subscribed_to")
 
     def __str__(self):
-        return (f"{self.subscriber.username.__str__()} subscribed to "
-                f"{self.subscribed_to.username.__str__()}")
+        return (f"{self.subscriber.username} subscribed to "
+                f"{self.subscribed_to.username}")

@@ -2,7 +2,6 @@ import base64
 
 from rest_framework import serializers, validators
 
-from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.urls import reverse
 from django.db import transaction
@@ -11,9 +10,7 @@ from djoser import serializers as djoser_serializers
 
 from recipes.models import (Ingredient, Recipe, RecipeIngredient, Favorite,
                             ShoppingCart)
-from users.models import Avatar, Subscription
-
-User = get_user_model()
+from users.models import User, Subscription
 
 
 class Base64ImageField(serializers.ImageField):
@@ -29,17 +26,18 @@ class Base64ImageField(serializers.ImageField):
 
 
 class AvatarSerializer(serializers.ModelSerializer):
-    avatar = Base64ImageField(source="image")
+    avatar = Base64ImageField()
 
     class Meta:
-        model = Avatar
+        model = User
         fields = ("avatar", )
+        extra_kwargs = {"avatar": {"required": True}}
 
-    def to_representation(self, avatar):
-        return {
-            "avatar":
-            self.context.get("request").build_absolute_uri(avatar.image.url)
-        }
+    def to_representation(self, user):
+        if user.avatar:
+            request = self.context.get("request")
+            return {"avatar": request.build_absolute_uri(user.avatar.url)}
+        return {"avatar": None}
 
 
 class UserShortSerializer(djoser_serializers.UserCreateSerializer):
@@ -75,7 +73,7 @@ class UserShortSerializer(djoser_serializers.UserCreateSerializer):
 
 
 class UserSerializer(UserShortSerializer):
-    avatar = serializers.ImageField(source="avatar.image", read_only=True)
+    avatar = serializers.ImageField(read_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta(UserShortSerializer.Meta):
