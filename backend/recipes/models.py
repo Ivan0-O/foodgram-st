@@ -6,10 +6,13 @@ from django.db import models
 
 from users.models import User
 
-from foodgram_backend.constants import (INGREDIENT_NAME_MAX_LENGTH,
-                                        INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
-                                        RECIPE_NAME_MAX_LENGTH,
-                                        RECIPE_IMAGE_UPLOAD_PATH)
+from foodgram_backend.constants import (
+    INGREDIENT_NAME_MAX_LENGTH,
+    INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
+    RECIPE_NAME_MAX_LENGTH,
+    RECIPE_IMAGE_UPLOAD_PATH,
+    SHORT_LINK_LENGTH,
+)
 
 
 class Ingredient(models.Model):
@@ -28,7 +31,9 @@ class Ingredient(models.Model):
 
 
 def create_slug():
-    return "".join(random.choices(string.ascii_letters + string.digits, k=8))
+    return "".join(
+        random.choices(string.ascii_letters + string.digits,
+                       k=SHORT_LINK_LENGTH))
 
 
 class Recipe(models.Model):
@@ -52,7 +57,7 @@ class Recipe(models.Model):
 
     published_at = models.DateTimeField("Дата публикации", auto_now_add=True)
 
-    short_link = models.SlugField(max_length=8,
+    short_link = models.SlugField(max_length=SHORT_LINK_LENGTH,
                                   unique=True,
                                   default=create_slug,
                                   editable=False)
