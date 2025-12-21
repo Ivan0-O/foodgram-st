@@ -230,27 +230,31 @@ class RecipeSerializer(RecipeShortSerialzier):
         return super().validate(recipe)
 
     def _create_ingredients(self, recipe, ingredients):
-        for ingredient_data in ingredients:
-            id = ingredient_data.get("id")
-            amount = ingredient_data.get("amount")
+        ingredients_ids = [ingredient["id"] for ingredient in ingredients]
+        ingredients_amounts = [
+            ingredient["amount"] for ingredient in ingredients
+        ]
 
-            # Can't use get_object_404 because the code 400 is required
-            try:
-                ingredient = Ingredient.objects.get(pk=id)
+        if (ingredients_ids.__len__() != set(ingredients_ids).__len__()):
+            raise serializers.ValidationError(
+                {"ingredients": ["Ingredients cannot repeat."]})
 
-            except Ingredient.DoesNotExist:
-                raise serializers.ValidationError(
-                    {"detail": f"Ingredient with id {id} does not exist."})
+        existing_ingredients_ids = Ingredient.objects.filter(
+            id__in=ingredients_ids).values_list("id")
 
-            # checking for duplicates
-            if RecipeIngredient.objects.filter(recipe=recipe,
-                                               ingredient=ingredient).exists():
-                raise serializers.ValidationError(
-                    {"ingredients": ["Ingredients cannot repeat."]})
+        if existing_ingredients_ids.__len__() != ingredients_ids.__len__():
+            missing_id = (id for id in ingredients_ids
+                          if id not in existing_ingredients_ids).__next__()
+            raise serializers.ValidationError(
+                {"detail": f"Ingredient with id {missing_id} does not exist."})
 
-            RecipeIngredient.objects.create(recipe=recipe,
-                                            ingredient=ingredient,
-                                            amount=amount)
+        RecipeIngredient.objects.bulk_create([
+            RecipeIngredient(
+                recipe=recipe,
+                ingredient_id=id,
+                amount=amount,
+            ) for id, amount in zip(ingredients_ids, ingredients_amounts)
+        ])
 
     def create(self, validated_data):
         # we handle it ourselves
