@@ -48,7 +48,7 @@ class Recipe(models.Model):
         validators=[validators.MinValueValidator(1)]
         )
 
-    published = models.DateTimeField("Дата публикации", auto_now_add=True)
+    published_at = models.DateTimeField("Дата публикации", auto_now_add=True)
 
     class Meta:
         verbose_name = "рецепт"
