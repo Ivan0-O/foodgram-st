@@ -179,13 +179,6 @@ class RecipeShortSerialzier(serializers.ModelSerializer):
             recipe.image.url)
         return data
 
-    def validate_cooking_time(self, cooking_time):
-        if cooking_time < 1:
-            raise serializers.ValidationError(
-                "Cooking time should be atleast 1.")
-
-        return cooking_time
-
 
 class ShortLinkSerializer(serializers.ModelSerializer):
 

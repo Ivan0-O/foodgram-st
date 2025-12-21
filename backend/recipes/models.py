@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.core import validators
 from django.db import models
+
 
 from foodgram_backend.constants import (
     INGREDIENT_NAME_MAX_LENGTH,
@@ -41,8 +43,10 @@ class Recipe(models.Model):
     )
     text = models.TextField(verbose_name="Описание")
 
-    cooking_time = models.PositiveIntegerField(
-        verbose_name="Время приготовления")
+    cooking_time = models.PositiveSmallIntegerField(
+        verbose_name="Время приготовления",
+        validators=[validators.MinValueValidator(1)]
+        )
 
     published = models.DateTimeField("Дата публикации", auto_now_add=True)
 
