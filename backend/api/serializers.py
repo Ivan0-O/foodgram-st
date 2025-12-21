@@ -159,12 +159,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         model = RecipeIngredient
         fields = ("id", "name", "measurement_unit", "amount")
 
-    def validate_amount(self, amount):
-        if amount < 1:
-            raise serializers.ValidationError("Amount should be atleast 1.")
-
-        return amount
-
 
 class RecipeShortSerialzier(serializers.ModelSerializer):
     image = Base64ImageField(write_only=True, required=True)

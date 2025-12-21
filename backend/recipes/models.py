@@ -2,20 +2,17 @@ from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 
-
-from foodgram_backend.constants import (
-    INGREDIENT_NAME_MAX_LENGTH,
-    INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
-    RECIPE_NAME_MAX_LENGTH,
-    RECIPE_IMAGE_UPLOAD_PATH
-)
+from foodgram_backend.constants import (INGREDIENT_NAME_MAX_LENGTH,
+                                        INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
+                                        RECIPE_NAME_MAX_LENGTH,
+                                        RECIPE_IMAGE_UPLOAD_PATH)
 
 User = get_user_model()
 
 
 class Ingredient(models.Model):
-    name = models.CharField(
-        max_length=INGREDIENT_NAME_MAX_LENGTH, verbose_name="Название")
+    name = models.CharField(max_length=INGREDIENT_NAME_MAX_LENGTH,
+                            verbose_name="Название")
     measurement_unit = models.CharField(
         max_length=INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
         verbose_name="Единица измерения")
@@ -33,8 +30,8 @@ class Recipe(models.Model):
                                related_name="recipes",
                                on_delete=models.CASCADE,
                                verbose_name="Автор")
-    name = models.CharField(
-        max_length=RECIPE_NAME_MAX_LENGTH, verbose_name="Название")
+    name = models.CharField(max_length=RECIPE_NAME_MAX_LENGTH,
+                            verbose_name="Название")
     image = models.ImageField(
         upload_to=RECIPE_IMAGE_UPLOAD_PATH,
         null=True,
@@ -45,8 +42,7 @@ class Recipe(models.Model):
 
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name="Время приготовления",
-        validators=[validators.MinValueValidator(1)]
-        )
+        validators=[validators.MinValueValidator(1)])
 
     published_at = models.DateTimeField("Дата публикации", auto_now_add=True)
 
@@ -59,19 +55,18 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(
-        Recipe, related_name="recipe_ingredients", on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(
-        Ingredient, related_name="recipe_ingredients",
-        on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
+    recipe = models.ForeignKey(Recipe,
+                               related_name="recipe_ingredients",
+                               on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient,
+                                   related_name="recipe_ingredients",
+                                   on_delete=models.CASCADE)
+    amount = models.PositiveSmallIntegerField(
+        validators=[validators.MinValueValidator(1)])
 
     def __str__(self):
-        return (
-            f"{self.recipe}: {self.ingredient.name} "
-            f"{self.amount} {(self.ingredient
-                                        .measurement_unit)}"
-        )
+        return (f"{self.recipe}: {self.ingredient.name} "
+                f"{self.amount} {(self.ingredient.measurement_unit)}")
 
 
 class Favorite(models.Model):
