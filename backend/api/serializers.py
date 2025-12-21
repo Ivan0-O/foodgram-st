@@ -5,6 +5,7 @@ from rest_framework import serializers, validators
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.urls import reverse
+from django.db import transaction
 
 from djoser import serializers as djoser_serializers
 
@@ -263,17 +264,14 @@ class RecipeSerializer(RecipeShortSerialzier):
 
     def create(self, validated_data):
         # we handle it ourselves
-        # shady stuff
         validated_data.pop("recipe_ingredients", None)
-        # create the recipe as normal
-        recipe = Recipe.objects.create(**validated_data)
 
-        try:
+        # transaction will revert the creation if a validation error occurs
+        with transaction.atomic():
+            recipe = Recipe.objects.create(**validated_data)
+
             self._create_ingredients(recipe,
                                      self.initial_data.get("ingredients"))
-        except serializers.ValidationError as err:
-            recipe.delete()
-            raise err
 
         return recipe
 
