@@ -111,8 +111,7 @@ class UserViewSet(djoser_views.UserViewSet):
                 return Response(
                     data={"detail": "Not subscribed to that user."},
                     status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         # POST
         # already subscribed
@@ -223,8 +222,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(
                     data={"detail": "This recipe is not in your favorites."},
                     status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         # POST
         # already in favs
@@ -257,8 +255,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     "This recipe is not in your shopping cart."
                 },
                     status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         # POST
         # already in shopping cart
