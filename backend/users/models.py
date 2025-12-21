@@ -19,13 +19,18 @@ class User(AbstractUser):
 class Subscription(models.Model):
     subscriber = models.ForeignKey(User,
                                    on_delete=models.CASCADE,
-                                   related_name="subscriptions")
+                                   related_name="subscriptions",
+                                   verbose_name="Подписчик")
     subscribed_to = models.ForeignKey(User,
                                       on_delete=models.CASCADE,
-                                      related_name="subscribers")
+                                      related_name="subscribers",
+                                      verbose_name="Подписан на")
 
     class Meta:
         unique_together = ("subscriber", "subscribed_to")
+
+        verbose_name = "подписка"
+        verbose_name_plural = "Подписки"
 
     def __str__(self):
         return (f"{self.subscriber.username} subscribed to "
