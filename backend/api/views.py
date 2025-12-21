@@ -18,7 +18,7 @@ from recipes.models import (Ingredient, Recipe, RecipeIngredient, Favorite,
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeShortSerialzier, AvatarSerializer,
                           UserWithRecipesSerializer, ShortLinkSerializer)
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .pagination import PageLimitPagination
 
 from .permissions import IsAuthorOrReadOnly
@@ -144,13 +144,13 @@ class UserViewSet(djoser_views.UserViewSet):
 
 class IngredientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                         viewsets.GenericViewSet):
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = None
 
-    def get_queryset(self):
-        name = self.request.query_params.get("name", "")
-        return Ingredient.objects.filter(name__istartswith=name)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

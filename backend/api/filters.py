@@ -3,7 +3,7 @@ from django_filters import filters
 
 from django.db.models import Q
 
-from recipes.models import Recipe
+from recipes.models import Recipe, Ingredient
 
 BOOL = (
     ("1", "True"),
@@ -65,3 +65,11 @@ class RecipeFilter(FilterSet):
             filter = ~filter
 
         return queryset.filter(filter)
+
+
+class IngredientFilter(FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='istartswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ["name"]
