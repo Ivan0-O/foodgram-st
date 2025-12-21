@@ -1,6 +1,6 @@
 import base64
 
-from rest_framework import serializers, validators
+from rest_framework import serializers
 
 from django.core.files.base import ContentFile
 from django.urls import reverse
