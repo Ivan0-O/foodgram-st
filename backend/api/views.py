@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Value, Exists, OuterRef
 from django.http import HttpResponse
 
 from djoser import views as djoser_views
@@ -31,7 +31,6 @@ User = get_user_model()
 class UserViewSet(djoser_views.UserViewSet):
     queryset = (
         User.objects
-        .all()
         .order_by("username")
         .annotate(recipes_count=Count("recipes"))
     )
@@ -157,7 +156,6 @@ class IngredientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly
@@ -171,7 +169,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
-        return self.queryset.order_by("-published")
+        queryset = Recipe.objects.order_by("-published")
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return queryset.annotate(is_favorited=Value(
+                False), is_in_shopping_cart=Value(False))
+
+        return queryset.annotate(
+            is_favorited=Exists(Favorite.objects.filter(
+                user=user, recipe=OuterRef("pk"))),
+            is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
+                user=user, recipe=OuterRef("pk"))),
+        )
 
     @action(
         detail=True,

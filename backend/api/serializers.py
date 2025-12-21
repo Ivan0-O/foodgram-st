@@ -203,8 +203,8 @@ class ShortLinkSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(RecipeShortSerialzier):
     author = UserSerializer(read_only=True)
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.BooleanField(read_only=True)
+    is_in_shopping_cart = serializers.BooleanField(read_only=True)
     ingredients = RecipeIngredientSerializer(source="recipe_ingredients",
                                              many=True,
                                              required=False)
@@ -290,9 +290,3 @@ class RecipeSerializer(RecipeShortSerialzier):
         if not user.is_authenticated:
             return False
         return model.objects.filter(user=user, recipe=recipe).exists()
-
-    def get_is_favorited(self, recipe):
-        return self._user_recipe_getter_mixin(recipe, Favorite)
-
-    def get_is_in_shopping_cart(self, recipe):
-        return self._user_recipe_getter_mixin(recipe, ShoppingCart)
