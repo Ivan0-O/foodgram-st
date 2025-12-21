@@ -41,8 +41,6 @@ class AvatarSerializer(serializers.ModelSerializer):
 
 
 class UserShortSerializer(djoser_serializers.UserCreateSerializer):
-    email = serializers.EmailField(
-        validators=[validators.UniqueValidator(queryset=User.objects.all())])
 
     class Meta(djoser_serializers.UserCreateSerializer.Meta):
         fields = (
@@ -103,7 +101,7 @@ class UserWithRecipesSerializer(UserSerializer):
             limit = int(limit)
             recipes = recipes[:limit]
 
-        serializer = RecipeShortSerialzier(instance=recipes,
+        serializer = RecipeShortSerializer(instance=recipes,
                                            many=True,
                                            context=self.context)
         return serializer.data
@@ -157,7 +155,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "measurement_unit", "amount")
 
 
-class RecipeShortSerialzier(serializers.ModelSerializer):
+class RecipeShortSerializer(serializers.ModelSerializer):
     image = Base64ImageField(write_only=True, required=True)
 
     class Meta:
@@ -186,7 +184,7 @@ class ShortLinkSerializer(serializers.ModelSerializer):
         }
 
 
-class RecipeSerializer(RecipeShortSerialzier):
+class RecipeSerializer(RecipeShortSerializer):
     author = UserSerializer(read_only=True)
 
     # Can't make these fields through queryset annotations in viewset
@@ -199,7 +197,7 @@ class RecipeSerializer(RecipeShortSerialzier):
                                              many=True,
                                              required=False)
 
-    class Meta(RecipeShortSerialzier.Meta):
+    class Meta(RecipeShortSerializer.Meta):
         # redefining and not inheriting because we need to keep the specified
         # ordering (e.g. `author` goes after `id` but before `name`)
         fields = ("id", "author", "ingredients", "is_favorited",
@@ -230,7 +228,7 @@ class RecipeSerializer(RecipeShortSerialzier):
                 {"ingredients": ["Ingredients cannot repeat."]})
 
         existing_ingredients_ids = Ingredient.objects.filter(
-            id__in=ingredients_ids).values_list("id")
+            id__in=ingredients_ids).values_list("id", flat=True)
 
         if existing_ingredients_ids.__len__() != ingredients_ids.__len__():
             missing_id = (id for id in ingredients_ids

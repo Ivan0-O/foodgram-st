@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import validators
 from django.db import models
 
 from foodgram_backend.constants import (
@@ -14,24 +15,28 @@ from foodgram_backend.constants import (
 # see TokenCreateSerializer from api.views
 class User(AbstractUser):
     # make email unique
-    email = models.EmailField(verbose_name="Электронная почта",
-                              max_length=USER_EMAIL_MAX_LENGTH,
-                              unique=True,
-                              )
+    email = models.EmailField(
+        verbose_name="Электронная почта",
+        max_length=USER_EMAIL_MAX_LENGTH,
+        unique=True,
+    )
 
-    username = models.CharField(verbose_name="Имя пользователя",
-                                max_length=USER_USERNAME_MAX_LENGTH,
-                                unique=True,
-                                db_index=True,
-                                )
+    username = models.CharField(
+        verbose_name="Имя пользователя",
+        max_length=USER_USERNAME_MAX_LENGTH,
+        unique=True,
+        db_index=True,
+        validators=[validators.ASCIIUsernameValidator()])
 
-    first_name = models.CharField(verbose_name="Имя",
-                                  max_length=USER_FIRST_NAME_MAX_LENGTH,
-                                  )
+    first_name = models.CharField(
+        verbose_name="Имя",
+        max_length=USER_FIRST_NAME_MAX_LENGTH,
+    )
 
-    last_name = models.CharField(verbose_name="Фамилия",
-                                 max_length=USER_LAST_NAME_MAX_LENGTH,
-                                 )
+    last_name = models.CharField(
+        verbose_name="Фамилия",
+        max_length=USER_LAST_NAME_MAX_LENGTH,
+    )
 
     avatar = models.ImageField(verbose_name="Аватар пользователя",
                                upload_to=USER_AVATAR_PATH,
