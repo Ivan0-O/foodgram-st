@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     # Apps
     "users.apps.UsersConfig",
     "recipes.apps.RecipesConfig",
-    "shortlinks.apps.ShortlinksConfig",
     "api.apps.ApiConfig",
 ]
 

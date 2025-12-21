@@ -22,7 +22,6 @@ from .filters import RecipeFilter, IngredientFilter
 from .pagination import PageLimitPagination
 
 from .permissions import IsAuthorOrReadOnly
-from shortlinks.models import ShortLink
 
 
 User = get_user_model()
@@ -182,8 +181,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def get_link(self, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
-        link, _ = ShortLink.objects.get_or_create(recipe=recipe)
-        serializer = self.get_serializer(link)
+        serializer = self.get_serializer(recipe.short_link)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     # @action(

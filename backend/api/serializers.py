@@ -12,7 +12,6 @@ from djoser import serializers as djoser_serializers
 from recipes.models import (Ingredient, Recipe, RecipeIngredient, Favorite,
                             ShoppingCart)
 from users.models import Avatar, Subscription
-from shortlinks.models import ShortLink
 
 User = get_user_model()
 
@@ -177,15 +176,15 @@ class RecipeShortSerialzier(serializers.ModelSerializer):
 class ShortLinkSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = ShortLink
+        model = Recipe
         fields = ("slug", )
         read_only_fields = ("slug", )
 
     def to_representation(self, link):
-        abs_url = reverse("shortlink", kwargs={"slug": link.slug})
+        absolute_url = reverse("shortlink", kwargs={"slug": link})
         return {
             "short-link":
-            self.context.get("request").build_absolute_uri(abs_url)
+            self.context.get("request").build_absolute_uri(absolute_url)
         }
 
 

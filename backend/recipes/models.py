@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
@@ -25,6 +28,10 @@ class Ingredient(models.Model):
         return f"{self.name} ({self.measurement_unit})"
 
 
+def create_slug():
+    return "".join(random.choices(string.ascii_letters + string.digits, k=8))
+
+
 class Recipe(models.Model):
     author = models.ForeignKey(User,
                                related_name="recipes",
@@ -45,6 +52,11 @@ class Recipe(models.Model):
         validators=[validators.MinValueValidator(1)])
 
     published_at = models.DateTimeField("Дата публикации", auto_now_add=True)
+
+    short_link = models.SlugField(max_length=8,
+                                  unique=True,
+                                  default=create_slug,
+                                  editable=False)
 
     class Meta:
         verbose_name = "рецепт"
