@@ -213,7 +213,7 @@ class RecipeSerializer(RecipeShortSerializer):
             raise serializers.ValidationError(
                 {"ingredients": ["This field is required."]})
 
-        if ingredients.__len__() == 0:
+        if len(ingredients) == 0:
             raise serializers.ValidationError(
                 {"ingredients": ["Ingredients cannot be empty."]})
 
@@ -225,14 +225,14 @@ class RecipeSerializer(RecipeShortSerializer):
             ingredient["amount"] for ingredient in ingredients
         ]
 
-        if (ingredients_ids.__len__() != set(ingredients_ids).__len__()):
+        if len(ingredients_ids) != len(set(ingredients_ids)):
             raise serializers.ValidationError(
                 {"ingredients": ["Ingredients cannot repeat."]})
 
         existing_ingredients_ids = Ingredient.objects.filter(
             id__in=ingredients_ids).values_list("id", flat=True)
 
-        if existing_ingredients_ids.__len__() != ingredients_ids.__len__():
+        if len(existing_ingredients_ids) != len(ingredients_ids):
             missing_id = (id for id in ingredients_ids
                           if id not in existing_ingredients_ids).__next__()
             raise serializers.ValidationError(
