@@ -11,8 +11,7 @@ SECRET_KEY = os.getenv(
     "django-insecure-i1d^n(q8gkw*574@d*e0hz5b9y!ym-zxq8vzgh1#bv4*uv1skh")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# os.getenv reads as string so need to convert to bool here
-DEBUG = False if os.getenv("DEBUG", "").lower() == "false" else True
+DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = [
     host for host in os.getenv("ALLOWED_HOSTS", "").split(",") if host
