@@ -287,3 +287,20 @@ class RecipeSerializer(RecipeShortSerializer):
 
     def get_is_in_shopping_cart(self, recipe):
         return self._user_recipe_getter_mixin(recipe, ShoppingCart)
+
+
+class BaseRelationshipSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        model_class = kwargs.get("context").get("model_class")
+        if model_class:
+            self.Meta.model = model_class
+        super().__init__(*args, **kwargs)
+
+    def create(self, validated_data):
+        validated_data[self.context["user_field"]] = self.context["user"]
+        validated_data[self.context["target_field"]] = self.context["target"]
+        return super().create(validated_data)

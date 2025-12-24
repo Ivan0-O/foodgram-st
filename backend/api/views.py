@@ -16,7 +16,8 @@ from recipes.models import (Ingredient, Recipe, RecipeIngredient, Favorite,
 
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeShortSerializer, AvatarSerializer,
-                          UserWithRecipesSerializer, ShortLinkSerializer)
+                          UserWithRecipesSerializer, ShortLinkSerializer,
+                          BaseRelationshipSerializer)
 from .filters import RecipeFilter, IngredientFilter
 from .pagination import PageLimitPagination
 
@@ -58,8 +59,19 @@ def _handle_relationship_action(view,
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # we don't have any serializers for relationship models
-    relationship_model.objects.create(**filter_kwargs)
+    serializer = BaseRelationshipSerializer(
+        data={},
+        context={
+            "model_class": relationship_model,
+            "user": user_object,
+            "target": target_object,
+            "user_field": user_field_name,
+            "target_field": target_field_name,
+            "request": request
+        }
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
 
     serializer = view.get_serializer(target_object)
     return Response(data=serializer.data, status=status.HTTP_201_CREATED)
