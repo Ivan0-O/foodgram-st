@@ -118,8 +118,7 @@ class UserViewSet(djoser_views.UserViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        user.avatar.delete(save=False)
-        user.avatar = None
+        user.avatar.delete()
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
