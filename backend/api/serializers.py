@@ -17,10 +17,11 @@ class Base64ImageField(serializers.ImageField):
 
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith("data:image"):
-            format, imgstr = data.split(";base64,")
-            ext = format.split("/")[-1]
+            format, image_string = data.split(";base64,")
+            extension = format.split("/")[-1]
 
-            data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
+            data = ContentFile(base64.b64decode(image_string),
+                               name="temp." + extension)
 
         return super().to_internal_value(data)
 
@@ -95,11 +96,11 @@ class UserWithRecipesSerializer(UserSerializer):
 
     def get_recipes(self, other_user):
         recipes = other_user.recipes.all()
-        limit = self.context.get("request").query_params.get(
+        recipes_limit = self.context.get("request").query_params.get(
             "recipes_limit", None)
-        if limit is not None:
-            limit = int(limit)
-            recipes = recipes[:limit]
+        if recipes_limit is not None:
+            recipes_limit = int(recipes_limit)
+            recipes = recipes[:recipes_limit]
 
         serializer = RecipeShortSerializer(instance=recipes,
                                            many=True,
@@ -118,23 +119,24 @@ class TokenCreateSerializer(djoser_serializers.TokenCreateSerializer):
             },
         }
 
-    def validate(self, attrs):
-        cred_err = djoser_serializers.ValidationError(
+    def validate(self, credentials):
+        credentials_error = djoser_serializers.ValidationError(
             "Invalid credentials provided.")
 
         # finding the user
         try:
             # Can't use get_object_404 because the code 400 is required
-            self.user = User.objects.get(email=attrs.get("email", None))
-        except Exception:
-            raise cred_err
+            self.user = User.objects.get(email=credentials.get("email", None))
+        except User.DoesNotExist:
+            raise credentials_error
 
-        if not self.user.check_password(attrs.get("password", None)):
-            raise cred_err
+        if not self.user.check_password(credentials.get("password", None)):
+            raise credentials_error
 
-        # setting attrs["user"] so it would appear in serializer.validated_data
-        attrs["user"] = self.user
-        return attrs
+        # setting credentials["user"] so it would appear
+        # in serializer.validated_data
+        credentials["user"] = self.user
+        return credentials
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -163,10 +165,10 @@ class RecipeShortSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "image", "cooking_time")
 
     def to_representation(self, recipe):
-        data = super().to_representation(recipe)
-        data["image"] = self.context.get("request").build_absolute_uri(
-            recipe.image.url)
-        return data
+        recipe_representation = super().to_representation(recipe)
+        recipe_representation["image"] = self.context.get(
+            "request").build_absolute_uri(recipe.image.url)
+        return recipe_representation
 
 
 class ShortLinkSerializer(serializers.ModelSerializer):

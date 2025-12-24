@@ -118,12 +118,12 @@ class UserViewSet(djoser_views.UserViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def subscriptions(self, request):
-        sub_to = (
+        subscribed_to = (
             self.get_queryset()
             .filter(subscribers__subscriber=request.user)
         )
         # serialize only a single page
-        page = self.paginate_queryset(sub_to)
+        page = self.paginate_queryset(subscribed_to)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(data=serializer.data)
 
@@ -141,14 +141,14 @@ class UserViewSet(djoser_views.UserViewSet):
             return Response(data={"detail": "Cannot subscribe to yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        sub_to = get_object_or_404(self.get_queryset(), pk=id)
+        subscribe_to = get_object_or_404(self.get_queryset(), pk=id)
 
         return _handle_relationship_action(
             self,
             request,
             Subscription,
             request.user,
-            sub_to,
+            subscribe_to,
             "subscriber",
             "subscribed_to",
             "Not subscribed to that user.",

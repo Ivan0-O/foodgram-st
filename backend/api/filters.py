@@ -5,7 +5,7 @@ from django.db.models import Q
 
 from recipes.models import Recipe, Ingredient
 
-BOOL = (
+BOOL_CHOICES = (
     ("1", "True"),
     ("True", "True"),
     ("true", "True"),
@@ -14,9 +14,9 @@ BOOL = (
     ("false", "False"),
 )
 
-BOOL_DICT = {
-    True: [v for v, _ in BOOL[:3]],
-    False: [v for v, _ in BOOL[3:]],
+BOOL_MAPPINGS = {
+    True: [string for string, _ in BOOL_CHOICES[:3]],
+    False: [string for string, _ in BOOL_CHOICES[3:]],
 }
 
 
@@ -24,9 +24,9 @@ BOOL_DICT = {
 # BooleanFilter only expects True/False and does not
 # want to call my filter functions when recieves 1/0
 def bool_coerce(value):
-    if value in BOOL_DICT[True]:
+    if value in BOOL_MAPPINGS[True]:
         return True
-    if value in BOOL_DICT[False]:
+    if value in BOOL_MAPPINGS[False]:
         return False
 
     # django_filters will print that this choice is not allowed
@@ -35,12 +35,14 @@ def bool_coerce(value):
 
 class RecipeFilter(FilterSet):
     is_favorited = filters.TypedChoiceFilter(
-        choices=BOOL,
+        choices=BOOL_CHOICES,
         coerce=bool_coerce,
         method="filter_is_favorited",
     )
     is_in_shopping_cart = filters.TypedChoiceFilter(
-        choices=BOOL, coerce=bool_coerce, method="filter_is_in_shopping_cart")
+        choices=BOOL_CHOICES,
+        coerce=bool_coerce,
+        method="filter_is_in_shopping_cart")
 
     class Meta:
         model = Recipe
