@@ -28,17 +28,13 @@ def _handle_relationship_action(view,
                                 target_field_name,
                                 delete_not_found_message,
                                 post_exists_message):
-    # Get or create the relationship object
     filter_kwargs = {user_field_name: user_object,
                      target_field_name: target_object}
     relationship_object = relationship_model.objects.filter(**filter_kwargs)
 
-    # DELETE
     if request.method == "DELETE":
-        # If the object was just created, it means it didn't exist before
         if not relationship_object.exists():
-            # not using get_object_or_404 because code 400
-            # is required by the docs
+
             return Response(
                 data={"detail": delete_not_found_message},
                 status=status.HTTP_400_BAD_REQUEST
@@ -46,8 +42,6 @@ def _handle_relationship_action(view,
         relationship_object.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # POST
-    # check if the relationship already exists
     if relationship_object.exists():
         return Response(
             data={"detail": post_exists_message},
@@ -80,7 +74,6 @@ class UserViewSet(djoser_views.UserViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = pagination.LimitOffsetPagination
 
-    # setting the permissions
     @action(
         detail=False,
         url_path="me",
@@ -98,14 +91,12 @@ class UserViewSet(djoser_views.UserViewSet):
     def avatar(self, request):
         user = request.user
 
-        # PUT
         if request.method == "PUT":
             serializer = self.get_serializer(user, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
 
-        # DELETE
         if not user.avatar:
             return Response(
                 {"detail": "You do not have an avatar."},
@@ -127,7 +118,7 @@ class UserViewSet(djoser_views.UserViewSet):
             self.get_queryset()
             .filter(subscribers__subscriber=request.user)
         )
-        # serialize only a single page
+
         page = self.paginate_queryset(subscribed_to)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(data=serializer.data)
@@ -246,14 +237,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .values("recipe")
         )
 
-        # select ingredients for all the recipes
         ingredients = (
             RecipeIngredient.objects
             .filter(recipe__in=recipes)
             .values("ingredient__name", "ingredient__measurement_unit")
         )
-        # add amount field that is the sum of all the occurences
-        # of the given ingredient
+
         ingredients = ingredients.annotate(
             total_amount=Sum("amount"))
 

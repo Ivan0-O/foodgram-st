@@ -17,16 +17,12 @@ BOOL_MAPPINGS = {
 }
 
 
-# Need to convert the value ourselves because default
-# BooleanFilter only expects True/False and does not
-# want to call my filter functions when recieves 1/0
 def bool_coerce(value):
     if value in BOOL_MAPPINGS[True]:
         return True
     if value in BOOL_MAPPINGS[False]:
         return False
 
-    # django_filters will print that this choice is not allowed
     raise ValueError()
 
 

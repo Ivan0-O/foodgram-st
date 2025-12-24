@@ -105,7 +105,6 @@ class UserWithRecipesSerializer(UserSerializer):
         return serializer.data
 
 
-# Requires email+password combination instead of default username+password
 class TokenCreateSerializer(djoser_serializers.TokenCreateSerializer):
 
     class Meta:
@@ -120,9 +119,8 @@ class TokenCreateSerializer(djoser_serializers.TokenCreateSerializer):
         credentials_error = djoser_serializers.ValidationError(
             "Invalid credentials provided.")
 
-        # finding the user
         try:
-            # Can't use get_object_404 because the code 400 is required
+
             self.user = User.objects.get(email=credentials.get("email", None))
         except User.DoesNotExist:
             raise credentials_error
@@ -130,8 +128,6 @@ class TokenCreateSerializer(djoser_serializers.TokenCreateSerializer):
         if not self.user.check_password(credentials.get("password", None)):
             raise credentials_error
 
-        # setting credentials["user"] so it would appear
-        # in serializer.validated_data
         credentials["user"] = self.user
         return credentials
 
@@ -186,9 +182,6 @@ class ShortLinkSerializer(serializers.ModelSerializer):
 class RecipeSerializer(RecipeShortSerializer):
     author = UserSerializer(read_only=True)
 
-    # Can't make these fields through queryset annotations in viewset
-    # because they wouldn't show on post requests
-    # which is required by the docs
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -197,14 +190,13 @@ class RecipeSerializer(RecipeShortSerializer):
                                              required=False)
 
     class Meta(RecipeShortSerializer.Meta):
-        # redefining and not inheriting because we need to keep the specified
-        # ordering (e.g. `author` goes after `id` but before `name`)
+
         fields = ("id", "author", "ingredients", "is_favorited",
                   "is_in_shopping_cart", "name", "image", "text",
                   "cooking_time")
 
     def validate(self, recipe):
-        # `ingredients` is being mapped to `recipe_ingredients`
+
         ingredients = recipe.get("recipe_ingredients")
         if ingredients is None:
             raise serializers.ValidationError(
@@ -244,10 +236,9 @@ class RecipeSerializer(RecipeShortSerializer):
         ])
 
     def create(self, validated_data):
-        # we handle it ourselves
+
         validated_data.pop("recipe_ingredients", None)
 
-        # transaction will revert the creation if a validation error occurs
         with transaction.atomic():
             recipe = Recipe.objects.create(**validated_data)
 
@@ -257,18 +248,16 @@ class RecipeSerializer(RecipeShortSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
-        # we handle it ourselves
+
         validated_data.pop("recipe_ingredients", None)
 
-        # update ingredients only if they were provided
         ingredients = self.initial_data.get("ingredients")
         if ingredients is not None:
-            # delete the old ones
+
             RecipeIngredient.objects.filter(recipe=recipe).delete()
 
             self._create_ingredients(recipe, ingredients)
 
-        # update all the other fields as normal
         recipe = super().update(recipe, validated_data)
 
         return recipe

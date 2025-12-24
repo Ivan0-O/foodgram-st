@@ -5,19 +5,15 @@ from .constants import DEFAULT_PAGE_SIZE
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
     "django-insecure-i1d^n(q8gkw*574@d*e0hz5b9y!ym-zxq8vzgh1#bv4*uv1skh")
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = [
     host for host in os.getenv("ALLOWED_HOSTS", "").split(",") if host
 ]
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -26,12 +22,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # DRF
     "rest_framework.authtoken",
     "rest_framework",
-    # Djoser
     "djoser",
-    # Apps
     "users.apps.UsersConfig",
     "recipes.apps.RecipesConfig",
     "api.apps.ApiConfig",
@@ -77,8 +70,6 @@ DATABASES = {
     }
 }
 
-# Password validation
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": ("django.contrib.auth.password_validation."
@@ -98,8 +89,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-
 LANGUAGE_CODE = "ru-RU"
 
 TIME_ZONE = "Europe/Moscow"
@@ -108,15 +97,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# our custom User model
 AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {

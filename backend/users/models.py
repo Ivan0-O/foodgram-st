@@ -8,10 +8,7 @@ from foodgram_backend.constants import (USER_AVATAR_PATH,
                                         USER_USERNAME_MAX_LENGTH)
 
 
-# logging in is done via an email+password combination
-# see TokenCreateSerializer from api.views
 class User(AbstractUser):
-    # make email unique
     email = models.EmailField(
         verbose_name="Электронная почта",
         max_length=USER_EMAIL_MAX_LENGTH,
