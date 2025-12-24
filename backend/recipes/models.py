@@ -1,5 +1,4 @@
 import random
-import string
 
 from django.core import validators
 from django.db import models
@@ -7,6 +6,7 @@ from foodgram_backend.constants import (INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
                                         INGREDIENT_NAME_MAX_LENGTH,
                                         RECIPE_IMAGE_UPLOAD_PATH,
                                         RECIPE_NAME_MAX_LENGTH,
+                                        SHORT_LINK_ALLOWED_CHARS,
                                         SHORT_LINK_LENGTH)
 from users.models import User
 
@@ -30,8 +30,7 @@ class Ingredient(models.Model):
 
 def create_slug():
     return "".join(
-        random.choices(string.ascii_letters + string.digits,
-                       k=SHORT_LINK_LENGTH))
+        random.choices(SHORT_LINK_ALLOWED_CHARS, k=SHORT_LINK_LENGTH))
 
 
 class Recipe(models.Model):

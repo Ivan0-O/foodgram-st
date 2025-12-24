@@ -1,3 +1,5 @@
+import string
+
 DEFAULT_PAGE_SIZE = 6
 
 INGREDIENT_NAME_MAX_LENGTH = 128
@@ -13,3 +15,4 @@ USER_LAST_NAME_MAX_LENGTH = 150
 USER_AVATAR_PATH = "users/"
 
 SHORT_LINK_LENGTH = 8
+SHORT_LINK_ALLOWED_CHARS = f"{string.ascii_letters}{string.digits}"
