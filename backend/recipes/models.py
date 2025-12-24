@@ -3,16 +3,12 @@ import string
 
 from django.core import validators
 from django.db import models
-
+from foodgram_backend.constants import (INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
+                                        INGREDIENT_NAME_MAX_LENGTH,
+                                        RECIPE_IMAGE_UPLOAD_PATH,
+                                        RECIPE_NAME_MAX_LENGTH,
+                                        SHORT_LINK_LENGTH)
 from users.models import User
-
-from foodgram_backend.constants import (
-    INGREDIENT_NAME_MAX_LENGTH,
-    INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
-    RECIPE_NAME_MAX_LENGTH,
-    RECIPE_IMAGE_UPLOAD_PATH,
-    SHORT_LINK_LENGTH,
-)
 
 
 class Ingredient(models.Model):

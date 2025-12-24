@@ -1,9 +1,6 @@
-from django_filters import FilterSet
-from django_filters import filters
-
 from django.db.models import Q
-
-from recipes.models import Recipe, Ingredient
+from django_filters import FilterSet, filters
+from recipes.models import Ingredient, Recipe
 
 BOOL_CHOICES = (
     ("1", "True"),

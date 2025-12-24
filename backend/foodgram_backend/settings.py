@@ -1,5 +1,5 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 from .constants import DEFAULT_PAGE_SIZE
 

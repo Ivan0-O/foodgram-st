@@ -1,14 +1,11 @@
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import validators
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-
-from foodgram_backend.constants import (
-    USER_USERNAME_MAX_LENGTH,
-    USER_AVATAR_PATH,
-    USER_EMAIL_MAX_LENGTH,
-    USER_FIRST_NAME_MAX_LENGTH,
-    USER_LAST_NAME_MAX_LENGTH,
-)
+from foodgram_backend.constants import (USER_AVATAR_PATH,
+                                        USER_EMAIL_MAX_LENGTH,
+                                        USER_FIRST_NAME_MAX_LENGTH,
+                                        USER_LAST_NAME_MAX_LENGTH,
+                                        USER_USERNAME_MAX_LENGTH)
 
 
 # logging in is done via an email+password combination

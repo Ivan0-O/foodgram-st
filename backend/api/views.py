@@ -1,28 +1,22 @@
-from django.shortcuts import get_object_or_404
-from django.db.models import Sum, Count
+from django.db.models import Count, Sum
 from django.http import HttpResponse
-
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser import views as djoser_views
-
-from rest_framework import viewsets, mixins, permissions, status, pagination
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart)
+from rest_framework import mixins, pagination, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from users.models import Subscription, User
 
-from django_filters.rest_framework import DjangoFilterBackend
-
-from users.models import User, Subscription
-from recipes.models import (Ingredient, Recipe, RecipeIngredient, Favorite,
-                            ShoppingCart)
-
-from .serializers import (IngredientSerializer, RecipeSerializer,
-                          RecipeShortSerializer, AvatarSerializer,
-                          UserWithRecipesSerializer, ShortLinkSerializer,
-                          SelfSubscriptionValidator,
-                          BaseRelationshipSerializer)
-from .filters import RecipeFilter, IngredientFilter
+from .filters import IngredientFilter, RecipeFilter
 from .pagination import PageLimitPagination
-
 from .permissions import IsAuthorOrReadOnly
+from .serializers import (AvatarSerializer, BaseRelationshipSerializer,
+                          IngredientSerializer, RecipeSerializer,
+                          RecipeShortSerializer, SelfSubscriptionValidator,
+                          ShortLinkSerializer, UserWithRecipesSerializer)
 
 
 def _handle_relationship_action(view,
