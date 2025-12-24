@@ -81,7 +81,6 @@ def _handle_relationship_action(view,
 class UserViewSet(djoser_views.UserViewSet):
     queryset = (
         User.objects
-        .order_by("username")
         .annotate(recipes_count=Count("recipes"))
     )
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -145,7 +144,6 @@ class UserViewSet(djoser_views.UserViewSet):
         serializer_class=UserWithRecipesSerializer,
     )
     def subscribe(self, request, id):
-        id = int(id)
         validator = SelfSubscriptionValidator(
             data={"user_id": id},
             context={"request": request}
@@ -182,7 +180,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.select_related("author").prefetch_related(
         "recipe_ingredients",
         "recipe_ingredients__ingredient"
-    ).order_by("-published_at")
+    )
     serializer_class = RecipeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly
@@ -263,7 +261,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         # add amount field that is the sum of all the occurences
         # of the given ingredient
         ingredients = ingredients.annotate(
-            total_amount=Sum("amount")).order_by("ingredient__name")
+            total_amount=Sum("amount"))
 
         if not ingredients.exists():
             file = "Your shopping cart is empty."

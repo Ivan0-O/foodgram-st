@@ -26,6 +26,8 @@ class Ingredient(models.Model):
         verbose_name = "ингредиент"
         verbose_name_plural = "Ингредиенты"
 
+        ordering = ("name", )
+
     def __str__(self):
         return f"{self.name} ({self.measurement_unit})"
 
@@ -65,6 +67,8 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = "рецепт"
         verbose_name_plural = "Рецепты"
+
+        ordering = ("-published_at", )
 
     def __str__(self):
         return self.name
