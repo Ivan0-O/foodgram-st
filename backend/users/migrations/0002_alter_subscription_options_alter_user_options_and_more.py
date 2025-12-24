@@ -9,51 +9,51 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='subscription',
-            options={'verbose_name': 'подписка', 'verbose_name_plural': 'Подписки'},
+            name="subscription",
+            options={"verbose_name": "подписка", "verbose_name_plural": "Подписки"},
         ),
         migrations.AlterModelOptions(
-            name='user',
-            options={'ordering': ('username',), 'verbose_name': 'пользователь', 'verbose_name_plural': 'Пользователи'},
+            name="user",
+            options={"ordering": ("username",), "verbose_name": "пользователь", "verbose_name_plural": "Пользователи"},
         ),
         migrations.AlterField(
-            model_name='subscription',
-            name='subscribed_to',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscribers', to=settings.AUTH_USER_MODEL, verbose_name='Подписан на'),
+            model_name="subscription",
+            name="subscribed_to",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="subscribers", to=settings.AUTH_USER_MODEL, verbose_name="Подписан на"),
         ),
         migrations.AlterField(
-            model_name='subscription',
-            name='subscriber',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscriptions', to=settings.AUTH_USER_MODEL, verbose_name='Подписчик'),
+            model_name="subscription",
+            name="subscriber",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="subscriptions", to=settings.AUTH_USER_MODEL, verbose_name="Подписчик"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='avatar',
-            field=models.ImageField(blank=True, default=None, upload_to='users/', verbose_name='Аватар пользователя'),
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(blank=True, default=None, upload_to="users/", verbose_name="Аватар пользователя"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='email',
-            field=models.EmailField(max_length=254, unique=True, verbose_name='Электронная почта'),
+            model_name="user",
+            name="email",
+            field=models.EmailField(max_length=254, unique=True, verbose_name="Электронная почта"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='first_name',
-            field=models.CharField(max_length=150, verbose_name='Имя'),
+            model_name="user",
+            name="first_name",
+            field=models.CharField(max_length=150, verbose_name="Имя"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(max_length=150, verbose_name='Фамилия'),
+            model_name="user",
+            name="last_name",
+            field=models.CharField(max_length=150, verbose_name="Фамилия"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='username',
-            field=models.CharField(db_index=True, max_length=150, unique=True, validators=[django.contrib.auth.validators.ASCIIUsernameValidator()], verbose_name='Имя пользователя'),
+            model_name="user",
+            name="username",
+            field=models.CharField(db_index=True, max_length=150, unique=True, validators=[django.contrib.auth.validators.ASCIIUsernameValidator()], verbose_name="Имя пользователя"),
         ),
     ]

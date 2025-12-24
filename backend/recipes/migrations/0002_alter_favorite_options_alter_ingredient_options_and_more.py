@@ -9,73 +9,73 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('recipes', '0001_initial'),
+        ("recipes", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='favorite',
-            options={'verbose_name': 'избранное', 'verbose_name_plural': 'Избранное'},
+            name="favorite",
+            options={"verbose_name": "избранное", "verbose_name_plural": "Избранное"},
         ),
         migrations.AlterModelOptions(
-            name='ingredient',
-            options={'ordering': ('name',), 'verbose_name': 'ингредиент', 'verbose_name_plural': 'Ингредиенты'},
+            name="ingredient",
+            options={"ordering": ("name",), "verbose_name": "ингредиент", "verbose_name_plural": "Ингредиенты"},
         ),
         migrations.AlterModelOptions(
-            name='recipe',
-            options={'ordering': ('-published_at',), 'verbose_name': 'рецепт', 'verbose_name_plural': 'Рецепты'},
+            name="recipe",
+            options={"ordering": ("-published_at",), "verbose_name": "рецепт", "verbose_name_plural": "Рецепты"},
         ),
         migrations.AlterModelOptions(
-            name='recipeingredient',
-            options={'verbose_name': 'ингредиент рецепта', 'verbose_name_plural': 'Ингредиенты рецептов'},
+            name="recipeingredient",
+            options={"verbose_name": "ингредиент рецепта", "verbose_name_plural": "Ингредиенты рецептов"},
         ),
         migrations.AlterModelOptions(
-            name='shoppingcart',
-            options={'verbose_name': 'Корзина', 'verbose_name_plural': 'Корзины'},
+            name="shoppingcart",
+            options={"verbose_name": "Корзина", "verbose_name_plural": "Корзины"},
         ),
         migrations.AlterField(
-            model_name='favorite',
-            name='recipe',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='favorited_by', to='recipes.recipe', verbose_name='Рецепт'),
+            model_name="favorite",
+            name="recipe",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="favorited_by", to="recipes.recipe", verbose_name="Рецепт"),
         ),
         migrations.AlterField(
-            model_name='favorite',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='favorites', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь'),
+            model_name="favorite",
+            name="user",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="favorites", to=settings.AUTH_USER_MODEL, verbose_name="Пользователь"),
         ),
         migrations.AlterField(
-            model_name='recipe',
-            name='image',
-            field=models.ImageField(default=None, upload_to='recipes/images/', verbose_name='Изображение'),
+            model_name="recipe",
+            name="image",
+            field=models.ImageField(default=None, upload_to="recipes/images/", verbose_name="Изображение"),
         ),
         migrations.AlterField(
-            model_name='recipe',
-            name='short_link',
-            field=models.SlugField(default=recipes.models.create_slug, editable=False, max_length=8, unique=True, verbose_name='Короткая ссылка'),
+            model_name="recipe",
+            name="short_link",
+            field=models.SlugField(default=recipes.models.create_slug, editable=False, max_length=8, unique=True, verbose_name="Короткая ссылка"),
         ),
         migrations.AlterField(
-            model_name='recipeingredient',
-            name='ingredient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recipe_ingredients', to='recipes.ingredient', verbose_name='Ингредиент'),
+            model_name="recipeingredient",
+            name="ingredient",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="recipe_ingredients", to="recipes.ingredient", verbose_name="Ингредиент"),
         ),
         migrations.AlterField(
-            model_name='recipeingredient',
-            name='recipe',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recipe_ingredients', to='recipes.recipe', verbose_name='Рецепт'),
+            model_name="recipeingredient",
+            name="recipe",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="recipe_ingredients", to="recipes.recipe", verbose_name="Рецепт"),
         ),
         migrations.AlterField(
-            model_name='shoppingcart',
-            name='recipe',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='in_shopping_cart_of', to='recipes.recipe', verbose_name='Рецепт'),
+            model_name="shoppingcart",
+            name="recipe",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="in_shopping_cart_of", to="recipes.recipe", verbose_name="Рецепт"),
         ),
         migrations.AlterField(
-            model_name='shoppingcart',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shopping_cart', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь'),
+            model_name="shoppingcart",
+            name="user",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="shopping_cart", to=settings.AUTH_USER_MODEL, verbose_name="Пользователь"),
         ),
         migrations.AlterUniqueTogether(
-            name='recipeingredient',
-            unique_together={('ingredient', 'recipe')},
+            name="recipeingredient",
+            unique_together={("ingredient", "recipe")},
         ),
     ]
