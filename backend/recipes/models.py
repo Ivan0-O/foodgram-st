@@ -12,11 +12,14 @@ from users.models import User
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=INGREDIENT_NAME_MAX_LENGTH,
-                            verbose_name="Название")
+    name = models.CharField(
+        verbose_name="Название",
+        max_length=INGREDIENT_NAME_MAX_LENGTH,
+    )
     measurement_unit = models.CharField(
+        verbose_name="Единица измерения",
         max_length=INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
-        verbose_name="Единица измерения")
+    )
 
     class Meta:
         verbose_name = "ингредиент"
@@ -34,17 +37,21 @@ def create_slug():
 
 
 class Recipe(models.Model):
-    author = models.ForeignKey(User,
-                               related_name="recipes",
-                               on_delete=models.CASCADE,
-                               verbose_name="Автор")
-    name = models.CharField(max_length=RECIPE_NAME_MAX_LENGTH,
-                            verbose_name="Название")
+    author = models.ForeignKey(
+        User,
+        verbose_name="Автор",
+        related_name="recipes",
+        on_delete=models.CASCADE,
+    )
+    name = models.CharField(
+        verbose_name="Название",
+        max_length=RECIPE_NAME_MAX_LENGTH,
+    )
     image = models.ImageField(
+        verbose_name="Изображение",
         upload_to=RECIPE_IMAGE_UPLOAD_PATH,
         null=True,
         default=None,
-        verbose_name="Изображение",
     )
     text = models.TextField(verbose_name="Описание")
 
@@ -52,9 +59,11 @@ class Recipe(models.Model):
         verbose_name="Время приготовления",
         validators=[validators.MinValueValidator(1)])
 
-    published_at = models.DateTimeField("Дата публикации", auto_now_add=True)
+    published_at = models.DateTimeField(verbose_name="Дата публикации",
+                                        auto_now_add=True)
 
-    short_link = models.SlugField(max_length=SHORT_LINK_LENGTH,
+    short_link = models.SlugField(verbose_name="Короткая ссылка",
+                                  max_length=SHORT_LINK_LENGTH,
                                   unique=True,
                                   default=create_slug,
                                   editable=False)
@@ -71,13 +80,21 @@ class Recipe(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe,
+                               verbose_name="Рецепт",
                                related_name="recipe_ingredients",
                                on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient,
+                                   verbose_name="Ингредиент",
                                    related_name="recipe_ingredients",
                                    on_delete=models.CASCADE)
     amount = models.PositiveSmallIntegerField(
         validators=[validators.MinValueValidator(1)])
+
+    class Meta:
+        verbose_name = "ингредиент рецепта"
+        verbose_name_plural = "Ингредиенты рецептов"
+
+        unique_together = ("ingredient", "recipe")
 
     def __str__(self):
         return (f"{self.recipe}: {self.ingredient.name} "
@@ -86,13 +103,18 @@ class RecipeIngredient(models.Model):
 
 class Favorite(models.Model):
     user = models.ForeignKey(User,
+                             verbose_name="Пользователь",
                              on_delete=models.CASCADE,
                              related_name="favorites")
     recipe = models.ForeignKey(Recipe,
+                               verbose_name="Рецепт",
                                on_delete=models.CASCADE,
                                related_name="favorited_by")
 
     class Meta:
+        verbose_name = "избранное"
+        verbose_name_plural = "Избранное"
+
         unique_together = ("user", "recipe")
 
     def __str__(self):
@@ -102,13 +124,18 @@ class Favorite(models.Model):
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(User,
+                             verbose_name="Пользователь",
                              on_delete=models.CASCADE,
                              related_name="shopping_cart")
     recipe = models.ForeignKey(Recipe,
+                               verbose_name="Рецепт",
                                on_delete=models.CASCADE,
                                related_name="in_shopping_cart_of")
 
     class Meta:
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзины"
+
         unique_together = ("user", "recipe")
 
     def __str__(self):

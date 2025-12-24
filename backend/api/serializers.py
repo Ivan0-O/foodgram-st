@@ -176,7 +176,7 @@ class ShortLinkSerializer(serializers.ModelSerializer):
         read_only_fields = ("slug", )
 
     def to_representation(self, link):
-        absolute_url = reverse("shortlink", kwargs={"slug": link})
+        absolute_url = reverse("short_link", kwargs={"slug": link})
         return {
             "short-link":
             self.context.get("request").build_absolute_uri(absolute_url)

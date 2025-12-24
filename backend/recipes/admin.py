@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Ingredient, Recipe, RecipeIngredient
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                     ShoppingCart)
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -12,8 +13,8 @@ class RecipeIngredientInline(admin.TabularInline):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ("name", "author", "cooking_time", "favorites_count")
-    search_fields = ("name", "author__username")
+    list_display = ("id", "name", "author", "cooking_time", "favorites_count")
+    search_fields = ("id", "name", "author__username")
     list_filter = ("author", )
     inlines = [RecipeIngredientInline]
 
@@ -25,6 +26,27 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ("name", "measurement_unit")
-    search_fields = ("name", "measurement_unit")
-    list_filter = ("measurement_unit", )
+    list_display = ("id", "name", "measurement_unit")
+    search_fields = ("id", "name", "measurement_unit")
+    list_filter = ("name", "measurement_unit")
+
+
+@admin.register(RecipeIngredient)
+class RecipeIngredientAdmin(admin.ModelAdmin):
+    list_display = ("id", "recipe", "ingredient", "amount")
+    list_filter = ("recipe", "ingredient")
+    search_fields = ("recipe__name", "ingredient__name")
+
+
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "recipe")
+    list_filter = ("user", )
+    search_fields = ("user__username", "recipe__name")
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "recipe")
+    list_filter = ("user", )
+    search_fields = ("user__username", "recipe__name")
