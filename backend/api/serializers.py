@@ -289,6 +289,15 @@ class RecipeSerializer(RecipeShortSerializer):
         return self._user_recipe_getter_mixin(recipe, ShoppingCart)
 
 
+class SelfSubscriptionValidator(serializers.Serializer):
+    user_id = serializers.IntegerField()
+
+    def validate_user_id(self, value):
+        if self.context["request"].user.id == value:
+            raise serializers.ValidationError("Cannot subscribe to yourself.")
+        return value
+
+
 class BaseRelationshipSerializer(serializers.ModelSerializer):
 
     class Meta:
