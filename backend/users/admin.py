@@ -1,12 +1,14 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
 from .models import Subscription, User
 
 
 @admin.register(User)
-class UserAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets + (("Аватар", {"fields": ("avatar", )}), )
+class UserAdmin(DefaultUserAdmin):
+    fieldsets = DefaultUserAdmin.fieldsets + (("Аватар", {
+        "fields": ("avatar", )
+    }), )
     search_fields = ("username", "email")
 
 
